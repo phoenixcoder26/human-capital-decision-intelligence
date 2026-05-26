@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCDIS · Workforce Intelligence Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --sky:       #e8f3fc;
+  --sky-mid:   #cce3f5;
+  --blue-100:  #b8d4ed;
+  --blue-200:  #8ab6e0;
+  --blue-300:  #5592d1;
+  --blue-400:  #2f72bc;
+  --blue-500:  #1a5ca5;
+  --blue-600:  #114a8e;
+  --blue-700:  #0c3a72;
+  --blue-800:  #082e60;
+  --white:     #ffffff;
+  --ink:       #0e2444;
+  --ink-mid:   #1e4070;
+  --text-1:    #0d2a50;
+  --text-2:    #2a5080;
+  --text-3:    #4a7ab5;
+  --text-4:    #7aa5c8;
+  --border:    #c0d8ee;
+  --border-lg: #d8eaf6;
+  --surface-0: #f0f7fd;
+  --surface-1: #e4f0fa;
+  --surface-2: rgba(255,255,255,0.88);
+  --card-bg:   rgba(255,255,255,0.92);
+  --red:       #d93b3b;
+  --red-lt:    #fde8e8;
+  --amber:     #d68400;
+  --amber-lt:  #fef3dc;
+  --green:     #1c8a54;
+  --green-lt:  #e0f5eb;
+  --cyan:      #0891b2;
+  --shadow:    0 2px 12px rgba(10,50,110,0.10);
+  --shadow-lg: 0 6px 24px rgba(10,50,110,0.14);
+}
+
+html,body{
+  background: var(--sky);
+  color: var(--text-1);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px;
+  line-height:1.5;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── Background scene ───────────────────────── */
+.bg-scene{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+.bg-gradient{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, #c8e2f5 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, #b5d4ec 0%, transparent 60%),
+    linear-gradient(170deg, #ddeefa 0%, #e8f4fb 50%, #d8edf8 100%);
+}
+
+/* Animated office-worker SVG */
+.worker-wrap{
+  position:absolute;
+  bottom:0; right:4%;
+  width:320px;
+  opacity:0.22;
+  transform-origin:bottom center;
+}
+.worker-wrap svg{ width:100%; height:auto; }
+
+/* Typing hand animation */
+@keyframes type{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.worker-hand{ animation:type 0.45s ease-in-out infinite; transform-origin:60% 80%; }
+
+/* Head slight bob */
+@keyframes bob{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}}
+.worker-head{ animation:bob 2.8s ease-in-out infinite; transform-origin:50% 100%; }
+
+/* Monitor glow pulse */
+@keyframes glow{0%,100%{opacity:0.7}50%{opacity:1}}
+.screen-glow{ animation:glow 2s ease-in-out infinite; }
+
+/* Floating data particles */
+.particle{
+  position:absolute;
+  border-radius:50%;
+  background:var(--blue-300);
+  opacity:0;
+  animation:float-up 6s ease-in-out infinite;
+}
+@keyframes float-up{
+  0%{opacity:0;transform:translateY(0) scale(1)}
+  20%{opacity:0.18}
+  80%{opacity:0.08}
+  100%{opacity:0;transform:translateY(-120px) scale(0.5)}
+}
+
+/* ── Layout ─────────────────────────────────── */
+.dashboard{
+  position:relative;
+  z-index:1;
+  max-width:1380px;
+  margin:0 auto;
+  padding:22px 22px 32px;
+}
+
+/* ── Header ──────────────────────────────────── */
+.header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  margin-bottom:24px;
+  padding-bottom:18px;
+  border-bottom:1.5px solid var(--border);
+  background:var(--surface-2);
+  border-radius:14px;
+  padding:18px 24px;
+  box-shadow:var(--shadow);
+}
+.hdr-left{}
+.sys-label{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9.5px;
+  letter-spacing:.18em;
+  color:var(--blue-400);
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+.hdr-title{
+  font-size:22px;
+  font-weight:800;
+  color:var(--ink);
+  letter-spacing:-0.02em;
+  line-height:1.1;
+}
+.hdr-title span{ color:var(--blue-400); }
+.hdr-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:4px;
+}
+.live-badge{
+  display:flex;align-items:center;gap:6px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;color:var(--green);
+  letter-spacing:.12em;
+  background:var(--green-lt);
+  padding:3px 10px;border-radius:20px;
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.ts-line{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;color:var(--text-4);
+  letter-spacing:.06em;
+}
+
+/* ── KPI Cards ───────────────────────────────── */
+.kpi-row{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:13px;
+  margin-bottom:20px;
+}
+.kpi{
+  background:var(--card-bg);
+  border:1.5px solid var(--border-lg);
+  border-radius:12px;
+  padding:15px 14px 13px;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+  transition:transform .18s,box-shadow .18s;
+  animation:slide-up .45s ease both;
+}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.kpi::after{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--top-bar,linear-gradient(90deg,var(--blue-400),var(--cyan)));
+  border-radius:2px 2px 0 0;
+}
+.kpi:nth-child(1){--top-bar:linear-gradient(90deg,#2f72bc,#0891b2);animation-delay:.04s}
+.kpi:nth-child(2){--top-bar:linear-gradient(90deg,#d68400,#d93b3b);animation-delay:.08s}
+.kpi:nth-child(3){--top-bar:linear-gradient(90deg,#1c8a54,#2f72bc);animation-delay:.12s}
+.kpi:nth-child(4){--top-bar:linear-gradient(90deg,#d93b3b,#d68400);animation-delay:.16s}
+.kpi:nth-child(5){--top-bar:linear-gradient(90deg,#d93b3b,#b02a8a);animation-delay:.20s}
+.kpi:nth-child(6){--top-bar:linear-gradient(90deg,#d68400,#1c8a54);animation-delay:.24s}
+
+@keyframes slide-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.kpi-lbl{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;letter-spacing:.13em;
+  color:var(--text-3);text-transform:uppercase;
+  margin-bottom:7px;
+}
+.kpi-val{
+  font-size:26px;font-weight:800;
+  letter-spacing:-0.03em;color:var(--ink);
+  line-height:1;margin-bottom:3px;
+}
+.kpi-sub{font-size:10.5px;color:var(--text-4);}
+.kpi-delta{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9.5px;margin-top:5px;
+}
+.kpi-delta.up{color:var(--red);}
+.kpi-delta.dn{color:var(--green);}
+.kpi-delta.nt{color:var(--text-4);}
+
+/* ── Panels ──────────────────────────────────── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.grid3{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px;}
+.full{margin-bottom:18px;}
+
+.panel{
+  background:var(--card-bg);
+  border:1.5px solid var(--border-lg);
+  border-radius:14px;
+  padding:18px 20px;
+  box-shadow:var(--shadow);
+  animation:slide-up .5s ease both;
+}
+.panel-tag{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;letter-spacing:.16em;
+  color:var(--blue-400);text-transform:uppercase;
+  margin-bottom:4px;
+}
+.panel-title{
+  font-size:13.5px;font-weight:700;
+  color:var(--ink);margin-bottom:2px;
+}
+.panel-sub{
+  font-size:10.5px;color:var(--text-4);
+  font-family:'IBM Plex Mono',monospace;
+  margin-bottom:14px;
+}
+.chart-box{position:relative;height:240px;}
+.chart-box-lg{position:relative;height:270px;}
+
+/* ── Heatmap ─────────────────────────────────── */
+.ht-wrap{overflow-x:auto;}
+table.htbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+table.htbl th{
+  padding:7px 11px;
+  font-family:'IBM Plex Mono',monospace;font-size:9px;
+  letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;
+  text-align:center;border-bottom:1.5px solid var(--border);
+  white-space:nowrap;background:var(--surface-1);
+}
+table.htbl th:first-child{text-align:left;}
+table.htbl td{
+  padding:8px 11px;text-align:center;
+  border-bottom:1px solid var(--border-lg);
+  font-family:'IBM Plex Mono',monospace;font-size:11px;
+  transition:filter .15s;
+}
+table.htbl td:first-child{
+  text-align:left;font-family:'Plus Jakarta Sans',sans-serif;
+  font-weight:600;font-size:12px;color:var(--ink);
+}
+table.htbl tr:hover td{filter:brightness(0.94);}
+
+/* ── Flight Risk Table ───────────────────────── */
+.ftbl-wrap{overflow-x:auto;max-height:290px;overflow-y:auto;}
+table.ftbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+table.ftbl th{
+  padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;
+  letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;
+  text-align:left;border-bottom:1.5px solid var(--border);
+  white-space:nowrap;position:sticky;top:0;background:var(--surface-1);z-index:1;
+}
+table.ftbl td{
+  padding:8px 10px;border-bottom:1px solid var(--border-lg);
+  color:var(--text-1);vertical-align:middle;
+}
+table.ftbl tr:hover td{background:var(--surface-0);}
+table.ftbl tr:last-child td{border-bottom:none;}
+
+.badge{
+  display:inline-block;padding:2px 8px;
+  border-radius:5px;font-family:'IBM Plex Mono',monospace;
+  font-size:9px;letter-spacing:.07em;text-transform:uppercase;
+  font-weight:500;white-space:nowrap;
+}
+.badge-critical{background:var(--red-lt);color:var(--red);border:1px solid #f5b8b8;}
+.badge-high{background:var(--amber-lt);color:var(--amber);border:1px solid #f5d98a;}
+.badge-moderate{background:#e5edf8;color:var(--blue-400);border:1px solid var(--blue-100);}
+.badge-monitor{background:var(--green-lt);color:var(--green);border:1px solid #a8dfc0;}
+
+.bar-wrap{display:flex;align-items:center;gap:6px;}
+.bar-bg{flex:1;height:5px;background:var(--sky-mid);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--text-3);}
+
+/* ── Footer ──────────────────────────────────── */
+.footer{
+  margin-top:24px;padding-top:14px;
+  border-top:1.5px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.footer-l,.footer-r{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9.5px;color:var(--text-4);letter-spacing:.07em;
+}
+</style>
+</head>
+<body>
+
+<!-- Background Scene -->
+<div class="bg-scene">
+  <div class="bg-gradient"></div>
+
+  <!-- Floating particles -->
+  <div class="particle" style="width:8px;height:8px;left:12%;bottom:30%;animation-delay:0s;animation-duration:7s"></div>
+  <div class="particle" style="width:5px;height:5px;left:18%;bottom:25%;animation-delay:1.2s;animation-duration:6s"></div>
+  <div class="particle" style="width:6px;height:6px;left:9%;bottom:35%;animation-delay:2.5s;animation-duration:8s"></div>
+  <div class="particle" style="width:4px;height:4px;right:35%;bottom:20%;animation-delay:0.8s;animation-duration:7.5s"></div>
+  <div class="particle" style="width:7px;height:7px;right:30%;bottom:40%;animation-delay:3s;animation-duration:6.5s"></div>
+
+  <!-- Animated office worker SVG -->
+  <div class="worker-wrap">
+    <svg viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Desk -->
+      <rect x="30" y="270" width="240" height="14" rx="4" fill="#7aaacf"/>
+      <rect x="50" y="284" width="8" height="100" rx="3" fill="#5a90bb"/>
+      <rect x="242" y="284" width="8" height="100" rx="3" fill="#5a90bb"/>
+      <!-- Monitor base -->
+      <rect x="118" y="258" width="14" height="14" rx="2" fill="#5a90bb"/>
+      <rect x="108" y="269" width="34" height="5" rx="2" fill="#4a80aa"/>
+      <!-- Monitor screen -->
+      <rect x="78" y="190" width="94" height="70" rx="6" fill="#2a6090"/>
+      <rect x="78" y="190" width="94" height="70" rx="6" fill="url(#screenGrad)"/>
+      <defs>
+        <linearGradient id="screenGrad" x1="78" y1="190" x2="172" y2="260" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#3a80cc"/>
+          <stop offset="100%" stop-color="#1a5090"/>
+        </linearGradient>
+      </defs>
+      <!-- Screen content glow -->
+      <g class="screen-glow">
+        <rect x="86" y="198" width="50" height="4" rx="2" fill="#7ec8f0" opacity=".8"/>
+        <rect x="86" y="206" width="36" height="3" rx="1.5" fill="#60b0e0" opacity=".6"/>
+        <rect x="86" y="213" width="60" height="3" rx="1.5" fill="#50a0d0" opacity=".5"/>
+        <rect x="86" y="220" width="44" height="3" rx="1.5" fill="#60b0e0" opacity=".6"/>
+        <rect x="86" y="227" width="32" height="8" rx="2" fill="#3a90d8" opacity=".7"/>
+        <rect x="124" y="227" width="28" height="8" rx="2" fill="#2a80c8" opacity=".5"/>
+        <rect x="86" y="239" width="70" height="12" rx="3" fill="#1a70b8" opacity=".5"/>
+      </g>
+      <!-- Chair back -->
+      <rect x="108" y="310" width="34" height="55" rx="8" fill="#4a85bb"/>
+      <rect x="112" y="365" width="26" height="8" rx="3" fill="#3a75aa"/>
+      <!-- Chair seat -->
+      <rect x="96" y="355" width="58" height="18" rx="8" fill="#5a95cc"/>
+      <!-- Chair legs -->
+      <line x1="105" y1="372" x2="88" y2="395" stroke="#4a80aa" stroke-width="5" stroke-linecap="round"/>
+      <line x1="145" y1="372" x2="162" y2="395" stroke="#4a80aa" stroke-width="5" stroke-linecap="round"/>
+      <line x1="125" y1="374" x2="125" y2="396" stroke="#4a80aa" stroke-width="5" stroke-linecap="round"/>
+      <!-- Body -->
+      <rect x="108" y="265" width="34" height="50" rx="10" fill="#4a8acc"/>
+      <!-- Collar -->
+      <rect x="118" y="265" width="14" height="10" rx="3" fill="#6aaae0"/>
+      <!-- Arms / typing hands -->
+      <g class="worker-hand">
+        <!-- Left arm reaching to keyboard -->
+        <path d="M108 285 Q85 290 72 278" stroke="#4a8acc" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <ellipse cx="70" cy="276" rx="8" ry="5" fill="#5a9ad8" transform="rotate(-20 70 276)"/>
+        <!-- Right arm -->
+        <path d="M142 285 Q162 290 175 278" stroke="#4a8acc" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <ellipse cx="177" cy="276" rx="8" ry="5" fill="#5a9ad8" transform="rotate(20 177 276)"/>
+      </g>
+      <!-- Keyboard -->
+      <rect x="64" y="263" width="60" height="9" rx="3" fill="#3a75aa" opacity=".8"/>
+      <rect x="126" y="263" width="60" height="9" rx="3" fill="#3a75aa" opacity=".8"/>
+      <!-- Head -->
+      <g class="worker-head">
+        <ellipse cx="125" cy="248" rx="18" ry="20" fill="#5a9ad8"/>
+        <!-- Hair -->
+        <ellipse cx="125" cy="232" rx="18" ry="8" fill="#2a5080"/>
+        <rect x="107" y="232" width="36" height="8" fill="#2a5080"/>
+        <!-- Face -->
+        <ellipse cx="119" cy="248" rx="2.5" ry="2.5" fill="#1a4070" opacity=".8"/>
+        <ellipse cx="131" cy="248" rx="2.5" ry="2.5" fill="#1a4070" opacity=".8"/>
+        <path d="M119 255 Q125 259 131 255" stroke="#1a4070" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".7"/>
+        <!-- Glasses -->
+        <rect x="115" y="245" width="9" height="6" rx="2" fill="none" stroke="#1a4070" stroke-width="1.2" opacity=".6"/>
+        <rect x="126" y="245" width="9" height="6" rx="2" fill="none" stroke="#1a4070" stroke-width="1.2" opacity=".6"/>
+        <line x1="124" y1="248" x2="126" y2="248" stroke="#1a4070" stroke-width="1.2" opacity=".6"/>
+      </g>
+      <!-- Coffee cup -->
+      <rect x="195" y="260" width="16" height="12" rx="3" fill="#c8dff0"/>
+      <path d="M211 264 Q217 264 217 268 Q217 272 211 272" stroke="#a8c8e0" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Steam -->
+      <path d="M199 257 Q201 253 199 249" stroke="#90b8d8" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".6" style="animation:float-up 3s ease-in-out infinite"/>
+      <path d="M204 256 Q206 252 204 248" stroke="#90b8d8" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5" style="animation:float-up 3s ease-in-out infinite;animation-delay:.8s"/>
+      <!-- Plant -->
+      <rect x="218" y="254" width="12" height="16" rx="3" fill="#3a75aa"/>
+      <ellipse cx="224" cy="250" rx="10" ry="8" fill="#2d8a4e" opacity=".85"/>
+      <ellipse cx="218" cy="252" rx="7" ry="6" fill="#36a05a" opacity=".85"/>
+      <ellipse cx="230" cy="252" rx="7" ry="6" fill="#36a05a" opacity=".85"/>
+    </svg>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="hdr-left">
+      <div class="sys-label">Human Capital Decision Intelligence System · v2.4 · Real Data</div>
+      <div class="hdr-title">Workforce <span>Intelligence</span> Command Center</div>
+    </div>
+    <div class="hdr-right">
+      <div class="live-badge"><div class="live-dot"></div>LIVE SYNC</div>
+      <div class="ts-line" id="ts">—</div>
+      <div class="ts-line">N = 1,000 employees · FY 2024 · synthetic_workforce.csv</div>
+    </div>
+  </header>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-lbl">Total Workforce</div>
+      <div class="kpi-val">1,000</div>
+      <div class="kpi-sub">Active employees</div>
+      <div class="kpi-delta nt">↔ Headcount stable</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Attrition Rate</div>
+      <div class="kpi-val">15.4%</div>
+      <div class="kpi-sub">Rolling 12-month · 154 exits</div>
+      <div class="kpi-delta up">↑ +2.1pp vs prior year</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Avg Engagement</div>
+      <div class="kpi-val">67.3</div>
+      <div class="kpi-sub">Score / 100 · 221 below 55</div>
+      <div class="kpi-delta up">↓ −3.2 pts below target</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">High-Risk Employees</div>
+      <div class="kpi-val">77</div>
+      <div class="kpi-sub">Flight risk ≥ 0.50</div>
+      <div class="kpi-delta up">↑ 7.7% of workforce</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">HP Flight Risks</div>
+      <div class="kpi-val">36</div>
+      <div class="kpi-sub">Perf ≥ 4 + risk ≥ 0.50</div>
+      <div class="kpi-delta up">↑ Critical priority</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-lbl">Replacement Exposure</div>
+      <div class="kpi-val">$6.1M</div>
+      <div class="kpi-sub">Est. cost — high-risk pool</div>
+      <div class="kpi-delta up">↑ Cost of inaction</div>
+    </div>
+  </div>
+
+  <!-- Row 1: Bubble + Dept Bar -->
+  <div class="grid2">
+    <div class="panel" style="animation-delay:.28s">
+      <div class="panel-tag">Talent Intelligence · Priority Matrix</div>
+      <div class="panel-title">Talent Risk Priority Matrix</div>
+      <div class="panel-sub">Bubble = replacement cost · Top-right = immediate action required</div>
+      <div class="chart-box-lg"><canvas id="bubbleChart"></canvas></div>
+    </div>
+    <div class="panel" style="animation-delay:.33s">
+      <div class="panel-tag">Workforce Risk · Departmental</div>
+      <div class="panel-title">Avg Flight Risk &amp; Attrition by Department</div>
+      <div class="panel-sub">Bar = avg flight risk score · Line = actual attrition rate</div>
+      <div class="chart-box-lg"><canvas id="deptChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Row 2: Heatmap full -->
+  <div class="panel full" style="animation-delay:.38s">
+    <div class="panel-tag">Workforce Planning · Multi-Dimensional Risk</div>
+    <div class="panel-title">Workforce Planning Heatmap</div>
+    <div class="panel-sub">Risk signal intensity by department — deeper blue = higher risk · Values are % of dept population</div>
+    <div class="ht-wrap"><table class="htbl" id="htbl"></table></div>
+  </div>
+
+  <!-- Row 3: Flight Risk Table + Engagement Donut -->
+  <div class="grid3">
+    <div class="panel" style="animation-delay:.43s">
+      <div class="panel-tag">Retention Priority · Critical Registry</div>
+      <div class="panel-title">High-Performer Flight Risk Registry</div>
+      <div class="panel-sub">Performance ≥ 4 · Flight risk ≥ 0.50 · Sorted by retention priority score · 36 employees</div>
+      <div class="ftbl-wrap">
+        <table class="ftbl" id="ftbl"></table>
+      </div>
+    </div>
+    <div class="panel" style="animation-delay:.48s">
+      <div class="panel-tag">Workforce Health · Engagement</div>
+      <div class="panel-title">Engagement Distribution</div>
+      <div class="panel-sub">Workforce across 5 engagement bands</div>
+      <div class="chart-box"><canvas id="engChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-l">HCDIS · Human Capital Decision Intelligence System · All data synthetic — portfolio demonstration only · synthetic_workforce.csv</div>
+    <div class="footer-r">Refresh in <span id="cd">30</span>s · <span id="ts2">—</span></div>
+  </div>
+</div>
+
+<script>
+// ─── REAL DATA from synthetic_workforce.csv ───────────────────────
+const BUBBLE_DATA = [{"id":"EMP00001","dept":"HR","jf":"Manager","loc":"San Francisco","perf":4,"eng":50.0,"risk":0.0,"rp":0.0,"rc":81450,"action":"No immediate action","compa":1.086,"tsp":1,"burn":0.289,"sal":108600,"tenure":6.5},{"id":"EMP00006","dept":"HR","jf":"Individual Contributor","loc":"Austin","perf":3,"eng":79.0,"risk":0.1,"rp":0.06,"rc":39250,"action":"No immediate action","compa":1.121,"tsp":26,"burn":0.073,"sal":78500,"tenure":6.4},{"id":"EMP00011","dept":"Legal","jf":"Manager","loc":"Remote","perf":3,"eng":65.0,"risk":0.0,"rp":0.0,"rc":81000,"action":"No immediate action","compa":0.982,"tsp":27,"burn":0.389,"sal":108000,"tenure":6.0},{"id":"EMP00016","dept":"Marketing","jf":"Individual Contributor","loc":"Austin","perf":2,"eng":95.0,"risk":0.35,"rp":0.14,"rc":34050,"action":"No immediate action","compa":0.927,"tsp":49,"burn":0.268,"sal":68100,"tenure":5.1},{"id":"EMP00021","dept":"Engineering","jf":"VP","loc":"London","perf":4,"eng":69.0,"risk":0.0,"rp":0.0,"rc":598400,"action":"No immediate action","compa":1.153,"tsp":22,"burn":0.202,"sal":299200,"tenure":6.2},{"id":"EMP00026","dept":"HR","jf":"Senior Manager","loc":"Chicago","perf":3,"eng":77.0,"risk":0.3,"rp":0.18,"rc":119400,"action":"No immediate action","compa":0.918,"tsp":38,"burn":0.239,"sal":119400,"tenure":1.9},{"id":"EMP00031","dept":"Customer Success","jf":"Individual Contributor","loc":"Remote","perf":3,"eng":48.0,"risk":0.55,"rp":0.33,"rc":30200,"action":"Monitor closely","compa":0.863,"tsp":32,"burn":0.318,"sal":60400,"tenure":1.7},{"id":"EMP00036","dept":"Customer Success","jf":"Individual Contributor","loc":"San Francisco","perf":3,"eng":76.0,"risk":0.0,"rp":0.0,"rc":31600,"action":"No immediate action","compa":0.903,"tsp":5,"burn":0.224,"sal":63200,"tenure":5.7},{"id":"EMP00041","dept":"Data Analytics","jf":"Director","loc":"New York","perf":2,"eng":74.0,"risk":0.0,"rp":0.0,"rc":273600,"action":"No immediate action","compa":0.937,"tsp":18,"burn":0.151,"sal":182400,"tenure":3.9},{"id":"EMP00046","dept":"Sales","jf":"Manager","loc":"Toronto","perf":3,"eng":82.0,"risk":0.2,"rp":0.12,"rc":90000,"action":"No immediate action","compa":1.143,"tsp":49,"burn":0.083,"sal":120000,"tenure":1.1},{"id":"EMP00051","dept":"Operations","jf":"Individual Contributor","loc":"San Francisco","perf":4,"eng":66.0,"risk":0.0,"rp":0.0,"rc":34250,"action":"No immediate action","compa":0.979,"tsp":26,"burn":0.219,"sal":68500,"tenure":4.8},{"id":"EMP00056","dept":"Legal","jf":"Senior Manager","loc":"London","perf":3,"eng":48.0,"risk":0.35,"rp":0.21,"rc":137200,"action":"No immediate action","compa":0.959,"tsp":30,"burn":0.283,"sal":137200,"tenure":1.0},{"id":"EMP00061","dept":"HR","jf":"Individual Contributor","loc":"Toronto","perf":4,"eng":66.0,"risk":0.2,"rp":0.16,"rc":29750,"action":"Compensation review","compa":0.85,"tsp":25,"burn":0.171,"sal":59500,"tenure":6.5},{"id":"EMP00076","dept":"Engineering","jf":"Individual Contributor","loc":"London","perf":3,"eng":37.0,"risk":0.55,"rp":0.33,"rc":41850,"action":"Monitor closely","compa":1.013,"tsp":38,"burn":0.389,"sal":83700,"tenure":6.4},{"id":"EMP00081","dept":"Customer Success","jf":"Individual Contributor","loc":"San Francisco","perf":4,"eng":45.0,"risk":0.55,"rp":0.44,"rc":35150,"action":"Monitor closely","compa":1.004,"tsp":53,"burn":0.369,"sal":70300,"tenure":2.7},{"id":"EMP00106","dept":"Marketing","jf":"Manager","loc":"Remote","perf":5,"eng":65.0,"risk":0.4,"rp":0.4,"rc":68775,"action":"Compensation review","compa":0.873,"tsp":38,"burn":0.307,"sal":91700,"tenure":2.3},{"id":"EMP00131","dept":"Engineering","jf":"Individual Contributor","loc":"Chicago","perf":3,"eng":75.0,"risk":0.45,"rp":0.27,"rc":47850,"action":"Career development plan","compa":1.159,"tsp":53,"burn":0.353,"sal":95700,"tenure":4.1},{"id":"EMP00151","dept":"Data Analytics","jf":"Individual Contributor","loc":"San Francisco","perf":4,"eng":65.0,"risk":0.6,"rp":0.48,"rc":35400,"action":"Monitor closely","compa":0.857,"tsp":50,"burn":0.202,"sal":70800,"tenure":3.4},{"id":"EMP00161","dept":"Operations","jf":"Individual Contributor","loc":"Chicago","perf":4,"eng":49.0,"risk":0.55,"rp":0.44,"rc":35550,"action":"Monitor closely","compa":1.016,"tsp":54,"burn":0.244,"sal":71100,"tenure":2.5},{"id":"EMP00201","dept":"Engineering","jf":"Senior Manager","loc":"Remote","perf":3,"eng":47.0,"risk":0.55,"rp":0.33,"rc":174800,"action":"Monitor closely","compa":1.14,"tsp":50,"burn":0.26,"sal":174800,"tenure":4.1},{"id":"EMP00216","dept":"Engineering","jf":"Manager","loc":"Remote","perf":3,"eng":67.0,"risk":0.5,"rp":0.3,"rc":79125,"action":"Monitor closely","compa":0.894,"tsp":42,"burn":0.196,"sal":105500,"tenure":5.8},{"id":"EMP00276","dept":"Marketing","jf":"Individual Contributor","loc":"Chicago","perf":3,"eng":51.0,"risk":0.45,"rp":0.27,"rc":42050,"action":"Career development plan","compa":1.144,"tsp":51,"burn":0.405,"sal":84100,"tenure":3.5},{"id":"EMP00286","dept":"Sales","jf":"Individual Contributor","loc":"Austin","perf":3,"eng":42.0,"risk":0.6,"rp":0.36,"rc":31950,"action":"Monitor closely","compa":0.869,"tsp":16,"burn":0.415,"sal":63900,"tenure":1.8},{"id":"EMP00331","dept":"Sales","jf":"Director","loc":"New York","perf":3,"eng":77.0,"risk":0.45,"rp":0.27,"rc":237000,"action":"Career development plan","compa":0.912,"tsp":52,"burn":0.345,"sal":158000,"tenure":6.0},{"id":"EMP00341","dept":"Operations","jf":"Manager","loc":"Toronto","perf":2,"eng":47.0,"risk":0.9,"rp":0.36,"rc":62700,"action":"Monitor closely","compa":0.836,"tsp":40,"burn":0.392,"sal":83600,"tenure":5.9},{"id":"EMP00351","dept":"Marketing","jf":"Individual Contributor","loc":"San Francisco","perf":4,"eng":39.0,"risk":0.75,"rp":0.6,"rc":28750,"action":"Immediate retention intervention","compa":0.782,"tsp":38,"burn":0.361,"sal":57500,"tenure":6.3},{"id":"EMP00421","dept":"Data Analytics","jf":"Senior Manager","loc":"New York","perf":4,"eng":36.0,"risk":0.55,"rp":0.44,"rc":135500,"action":"Monitor closely","compa":0.883,"tsp":19,"burn":0.314,"sal":135500,"tenure":2.7},{"id":"EMP00451","dept":"HR","jf":"Individual Contributor","loc":"London","perf":4,"eng":46.0,"risk":0.55,"rp":0.44,"rc":36950,"action":"Monitor closely","compa":1.056,"tsp":38,"burn":0.305,"sal":73900,"tenure":4.6},{"id":"EMP00461","dept":"Legal","jf":"Individual Contributor","loc":"London","perf":3,"eng":56.0,"risk":0.5,"rp":0.3,"rc":34000,"action":"Monitor closely","compa":0.883,"tsp":47,"burn":0.22,"sal":68000,"tenure":5.6},{"id":"EMP00506","dept":"Customer Success","jf":"Individual Contributor","loc":"Remote","perf":3,"eng":74.0,"risk":0.5,"rp":0.3,"rc":31050,"action":"Monitor closely","compa":0.887,"tsp":40,"burn":0.223,"sal":62100,"tenure":3.1},{"id":"EMP00521","dept":"Operations","jf":"Manager","loc":"New York","perf":5,"eng":65.0,"risk":0.5,"rp":0.5,"rc":66975,"action":"Immediate retention intervention","compa":0.893,"tsp":41,"burn":0.269,"sal":89300,"tenure":6.9},{"id":"EMP00546","dept":"Marketing","jf":"Individual Contributor","loc":"London","perf":4,"eng":62.0,"risk":0.5,"rp":0.4,"rc":32600,"action":"Monitor closely","compa":0.887,"tsp":63,"burn":0.166,"sal":65200,"tenure":6.5},{"id":"EMP00551","dept":"Engineering","jf":"Manager","loc":"Austin","perf":2,"eng":55.0,"risk":0.5,"rp":0.2,"rc":76050,"action":"Monitor closely","compa":0.859,"tsp":62,"burn":0.266,"sal":101400,"tenure":3.9},{"id":"EMP00603","dept":"Operations","jf":"Senior Manager","loc":"San Francisco","perf":5,"eng":47.0,"risk":0.65,"rp":0.65,"rc":109100,"action":"Immediate retention intervention","compa":0.839,"tsp":49,"burn":0.279,"sal":109100,"tenure":2.8},{"id":"EMP00687","dept":"Legal","jf":"Manager","loc":"Remote","perf":4,"eng":39.0,"risk":0.75,"rp":0.6,"rc":68325,"action":"Immediate retention intervention","compa":0.828,"tsp":37,"burn":0.273,"sal":91100,"tenure":1.7},{"id":"EMP00720","dept":"Data Analytics","jf":"Senior Manager","loc":"New York","perf":4,"eng":44.0,"risk":1.0,"rp":0.8,"rc":137400,"action":"Immediate retention intervention","compa":0.896,"tsp":39,"burn":0.389,"sal":137400,"tenure":6.1},{"id":"EMP00756","dept":"Marketing","jf":"Manager","loc":"Chicago","perf":3,"eng":56.0,"risk":0.5,"rp":0.3,"rc":68400,"action":"Monitor closely","compa":0.869,"tsp":53,"burn":0.154,"sal":91200,"tenure":3.2},{"id":"EMP00782","dept":"Engineering","jf":"Manager","loc":"London","perf":4,"eng":33.0,"risk":0.85,"rp":0.68,"rc":71475,"action":"Immediate retention intervention","compa":0.808,"tsp":42,"burn":0.325,"sal":95300,"tenure":6.5},{"id":"EMP00896","dept":"Sales","jf":"Individual Contributor","loc":"Remote","perf":4,"eng":38.0,"risk":0.75,"rp":0.6,"rc":32900,"action":"Immediate retention intervention","compa":0.895,"tsp":44,"burn":0.238,"sal":65800,"tenure":5.0},{"id":"EMP00966","dept":"Data Analytics","jf":"Director","loc":"Toronto","perf":3,"eng":80.0,"risk":0.5,"rp":0.3,"rc":250200,"action":"Monitor closely","compa":0.857,"tsp":40,"burn":0.178,"sal":166800,"tenure":1.4},{"id":"EMP00971","dept":"Finance","jf":"Director","loc":"Chicago","perf":4,"eng":40.0,"risk":0.55,"rp":0.44,"rc":231750,"action":"Monitor closely","compa":0.851,"tsp":1,"burn":0.306,"sal":154500,"tenure":5.5}];
+
+const HPFR_DATA = [{"id":"EMP00720","dept":"Data Analytics","jf":"Senior Manager","loc":"New York","perf":4,"eng":44.0,"risk":1.0,"rp":0.8,"rc":137400,"action":"Immediate retention intervention","compa":0.896,"tsp":39},{"id":"EMP00782","dept":"Engineering","jf":"Manager","loc":"London","perf":4,"eng":33.0,"risk":0.85,"rp":0.68,"rc":71475,"action":"Immediate retention intervention","compa":0.808,"tsp":42},{"id":"EMP00603","dept":"Operations","jf":"Senior Manager","loc":"San Francisco","perf":5,"eng":47.0,"risk":0.65,"rp":0.65,"rc":109100,"action":"Immediate retention intervention","compa":0.839,"tsp":49},{"id":"EMP00075","dept":"Engineering","jf":"Individual Contributor","loc":"Remote","perf":5,"eng":73.0,"risk":0.6,"rp":0.6,"rc":35350,"action":"Immediate retention intervention","compa":0.856,"tsp":45},{"id":"EMP00351","dept":"Marketing","jf":"Individual Contributor","loc":"San Francisco","perf":4,"eng":39.0,"risk":0.75,"rp":0.6,"rc":28750,"action":"Immediate retention intervention","compa":0.782,"tsp":38},{"id":"EMP00687","dept":"Legal","jf":"Manager","loc":"Remote","perf":4,"eng":39.0,"risk":0.75,"rp":0.6,"rc":68325,"action":"Immediate retention intervention","compa":0.828,"tsp":37},{"id":"EMP00690","dept":"Data Analytics","jf":"Senior Manager","loc":"Remote","perf":4,"eng":39.0,"risk":0.75,"rp":0.6,"rc":136300,"action":"Immediate retention intervention","compa":0.889,"tsp":40},{"id":"EMP00824","dept":"Operations","jf":"Individual Contributor","loc":"London","perf":4,"eng":46.0,"risk":0.75,"rp":0.6,"rc":29750,"action":"Immediate retention intervention","compa":0.85,"tsp":56},{"id":"EMP00896","dept":"Sales","jf":"Individual Contributor","loc":"Remote","perf":4,"eng":38.0,"risk":0.75,"rp":0.6,"rc":32900,"action":"Immediate retention intervention","compa":0.895,"tsp":44},{"id":"EMP00564","dept":"Operations","jf":"Manager","loc":"Chicago","perf":4,"eng":40.0,"risk":0.7,"rp":0.56,"rc":94575,"action":"Immediate retention intervention","compa":1.261,"tsp":54},{"id":"EMP00948","dept":"Marketing","jf":"Individual Contributor","loc":"San Francisco","perf":4,"eng":43.0,"risk":0.65,"rp":0.52,"rc":37000,"action":"Immediate retention intervention","compa":1.007,"tsp":39},{"id":"EMP00043","dept":"Product","jf":"Manager","loc":"Remote","perf":5,"eng":60.0,"risk":0.5,"rp":0.5,"rc":79425,"action":"Immediate retention intervention","compa":0.897,"tsp":58},{"id":"EMP00302","dept":"Product","jf":"Individual Contributor","loc":"London","perf":5,"eng":82.0,"risk":0.5,"rp":0.5,"rc":34650,"action":"Immediate retention intervention","compa":0.839,"tsp":42},{"id":"EMP00521","dept":"Operations","jf":"Manager","loc":"New York","perf":5,"eng":65.0,"risk":0.5,"rp":0.5,"rc":66975,"action":"Immediate retention intervention","compa":0.893,"tsp":41},{"id":"EMP00151","dept":"Data Analytics","jf":"Individual Contributor","loc":"San Francisco","perf":4,"eng":65.0,"risk":0.6,"rp":0.48,"rc":35400,"action":"Monitor closely","compa":0.857,"tsp":50},{"id":"EMP00575","dept":"Operations","jf":"Director","loc":"Toronto","perf":4,"eng":62.0,"risk":0.6,"rp":0.48,"rc":197100,"action":"Monitor closely","compa":0.796,"tsp":51},{"id":"EMP00600","dept":"Legal","jf":"Manager","loc":"New York","perf":4,"eng":79.0,"risk":0.6,"rp":0.48,"rc":67650,"action":"Monitor closely","compa":0.82,"tsp":47},{"id":"EMP00081","dept":"Customer Success","jf":"Individual Contributor","loc":"San Francisco","perf":4,"eng":45.0,"risk":0.55,"rp":0.44,"rc":35150,"action":"Monitor closely","compa":1.004,"tsp":53},{"id":"EMP00161","dept":"Operations","jf":"Individual Contributor","loc":"Chicago","perf":4,"eng":49.0,"risk":0.55,"rp":0.44,"rc":35550,"action":"Monitor closely","compa":1.016,"tsp":54},{"id":"EMP00290","dept":"Legal","jf":"Senior Manager","loc":"Austin","perf":4,"eng":70.0,"risk":0.55,"rp":0.44,"rc":151800,"action":"Monitor closely","compa":1.062,"tsp":59},{"id":"EMP00421","dept":"Data Analytics","jf":"Senior Manager","loc":"New York","perf":4,"eng":36.0,"risk":0.55,"rp":0.44,"rc":135500,"action":"Monitor closely","compa":0.883,"tsp":19},{"id":"EMP00451","dept":"HR","jf":"Individual Contributor","loc":"London","perf":4,"eng":46.0,"risk":0.55,"rp":0.44,"rc":36950,"action":"Monitor closely","compa":1.056,"tsp":38},{"id":"EMP00971","dept":"Finance","jf":"Director","loc":"Chicago","perf":4,"eng":40.0,"risk":0.55,"rp":0.44,"rc":231750,"action":"Monitor closely","compa":0.851,"tsp":1}];
+
+const DEPT_STATS = [{"dept":"Customer Success","n":86,"avgRisk":0.194,"attrR":19.8,"avgEng":67.4,"lowEng":20.9,"hiBurn":0.0,"belMkt":33.7,"hpfr":2},{"dept":"Data Analytics","n":104,"avgRisk":0.215,"attrR":16.3,"avgEng":65.8,"lowEng":25.0,"hiBurn":0.0,"belMkt":33.7,"hpfr":7},{"dept":"Engineering","n":112,"avgRisk":0.191,"attrR":24.1,"avgEng":68.6,"lowEng":22.3,"hiBurn":0.0,"belMkt":37.5,"hpfr":4},{"dept":"Finance","n":80,"avgRisk":0.181,"attrR":13.8,"avgEng":68.9,"lowEng":16.2,"hiBurn":0.0,"belMkt":31.2,"hpfr":2},{"dept":"HR","n":114,"avgRisk":0.164,"attrR":12.3,"avgEng":67.1,"lowEng":19.3,"hiBurn":0.0,"belMkt":30.7,"hpfr":2},{"dept":"Legal","n":104,"avgRisk":0.164,"attrR":15.4,"avgEng":67.1,"lowEng":16.3,"hiBurn":0.0,"belMkt":33.7,"hpfr":3},{"dept":"Marketing","n":103,"avgRisk":0.217,"attrR":9.7,"avgEng":66.8,"lowEng":28.2,"hiBurn":0.0,"belMkt":40.8,"hpfr":7},{"dept":"Operations","n":98,"avgRisk":0.216,"attrR":14.3,"avgEng":64.1,"lowEng":30.6,"hiBurn":0.0,"belMkt":27.6,"hpfr":6},{"dept":"Product","n":99,"avgRisk":0.18,"attrR":12.1,"avgEng":68.6,"lowEng":20.2,"hiBurn":0.0,"belMkt":36.4,"hpfr":2},{"dept":"Sales","n":100,"avgRisk":0.17,"attrR":16.0,"avgEng":68.5,"lowEng":21.0,"hiBurn":0.0,"belMkt":31.0,"hpfr":1}];
+
+const ENG_BANDS = [41, 180, 343, 288, 148];
+
+// ─── Timestamp ────────────────────────────────
+function updateTS(){
+  const n=new Date();
+  const s=n.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('ts').textContent=s;
+  document.getElementById('ts2').textContent=s;
+}
+updateTS(); setInterval(updateTS,1000);
+
+// Countdown
+let cd=30;
+setInterval(()=>{cd--;if(cd<=0)cd=30;document.getElementById('cd').textContent=cd;},1000);
+
+// ─── Chart.js defaults ─────────────────────────
+Chart.defaults.color='#4a7ab5';
+Chart.defaults.borderColor='rgba(176,210,238,0.6)';
+Chart.defaults.font.family="'IBM Plex Mono',monospace";
+Chart.defaults.font.size=11;
+
+// ─── Action color map ──────────────────────────
+const A_COLOR={
+  'Immediate retention intervention':'rgba(217,59,59,0.82)',
+  'Monitor closely':                 'rgba(214,132,0,0.82)',
+  'Career development plan':         'rgba(47,114,188,0.82)',
+  'Compensation review':             'rgba(8,145,178,0.82)',
+  'No immediate action':             'rgba(28,138,84,0.55)',
+};
+const A_BORDER={
+  'Immediate retention intervention':'#d93b3b',
+  'Monitor closely':'#d68400',
+  'Career development plan':'#2f72bc',
+  'Compensation review':'#0891b2',
+  'No immediate action':'#1c8a54',
+};
+
+// ─── CHART 1: Bubble Chart ─────────────────────
+const bubbleDS = Object.keys(A_COLOR).map(action=>({
+  label: action,
+  data: BUBBLE_DATA.filter(e=>e.action===action).map(e=>({
+    x: e.risk,
+    y: e.perf + (Math.random()-0.5)*0.25,
+    r: Math.max(4, Math.min(22, e.rc/15000)),
+    raw: e
+  })),
+  backgroundColor: A_COLOR[action],
+  borderColor: A_BORDER[action],
+  borderWidth:1.5,
+}));
+
+new Chart(document.getElementById('bubbleChart'),{
+  type:'bubble',
+  data:{datasets:bubbleDS},
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    animation:{duration:800,easing:'easeOutCubic'},
+    plugins:{
+      legend:{position:'bottom',labels:{boxWidth:10,padding:9,color:'#2a5080',font:{size:10}}},
+      tooltip:{
+        backgroundColor:'rgba(255,255,255,0.96)',titleColor:'#0e2444',bodyColor:'#2a5080',borderColor:'#c0d8ee',borderWidth:1,
+        callbacks:{label:ctx=>{
+          const e=ctx.raw.raw;
+          return[`${e.id} · ${e.dept}`,`Risk: ${(e.risk*100).toFixed(0)}%  Perf: ${e.perf}/5`,`Engagement: ${e.eng}  Compa: ${e.compa}`,`Repl. Cost: $${(e.rc/1000).toFixed(0)}k  Tenure: ${e.tenure}yr`,`→ ${e.action}`];
+        }}
+      }
+    },
+    scales:{
+      x:{title:{display:true,text:'Flight Risk Score',color:'#4a7ab5',font:{size:10}},min:0,max:1.05,grid:{color:'rgba(176,210,238,0.4)'},ticks:{color:'#4a7ab5',callback:v=>(v*100).toFixed(0)+'%'}},
+      y:{title:{display:true,text:'Performance Rating',color:'#4a7ab5',font:{size:10}},min:1,max:5.6,grid:{color:'rgba(176,210,238,0.4)'},ticks:{color:'#4a7ab5',stepSize:1}}
+    }
+  }
+});
+
+// ─── CHART 2: Dept Bar ─────────────────────────
+const dSorted=[...DEPT_STATS].sort((a,b)=>b.avgRisk-a.avgRisk);
+new Chart(document.getElementById('deptChart'),{
+  type:'bar',
+  data:{
+    labels:dSorted.map(d=>d.dept),
+    datasets:[
+      {label:'Avg Flight Risk %',data:dSorted.map(d=>+(d.avgRisk*100).toFixed(1)),
+       backgroundColor:dSorted.map(d=>d.avgRisk>0.21?'rgba(217,59,59,0.75)':d.avgRisk>0.18?'rgba(214,132,0,0.75)':'rgba(47,114,188,0.75)'),
+       borderColor:'transparent',borderRadius:5,yAxisID:'y'},
+      {label:'Attrition Rate %',data:dSorted.map(d=>d.attrR),type:'line',
+       borderColor:'#0891b2',backgroundColor:'transparent',borderWidth:2.5,
+       pointBackgroundColor:'#0891b2',pointRadius:4.5,tension:.3,yAxisID:'y'},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    animation:{duration:900,easing:'easeOutCubic'},
+    plugins:{
+      legend:{position:'bottom',labels:{boxWidth:10,padding:9,color:'#2a5080',font:{size:10}}},
+      tooltip:{backgroundColor:'rgba(255,255,255,0.96)',titleColor:'#0e2444',bodyColor:'#2a5080',borderColor:'#c0d8ee',borderWidth:1,
+        callbacks:{label:ctx=>{const d=dSorted[ctx.dataIndex];return ctx.dataset.label+': '+ctx.raw+'%  (n='+d.n+')';}}
+      }
+    },
+    scales:{
+      x:{grid:{color:'rgba(176,210,238,0.35)'},ticks:{color:'#4a7ab5',maxRotation:32,font:{size:10}}},
+      y:{grid:{color:'rgba(176,210,238,0.35)'},ticks:{color:'#4a7ab5',callback:v=>v+'%'},min:0}
+    }
+  }
+});
+
+// ─── HEATMAP TABLE ─────────────────────────────
+const HT_COLS=['Attrition %','Avg Risk %','Low Eng %','Below Mkt %','HP Flight Risk'];
+const tbl=document.getElementById('htbl');
+const th=tbl.createTHead().insertRow();
+[{t:'Department',a:'left'},...HT_COLS.map(c=>({t:c,a:'center'}))].forEach(c=>{
+  const el=document.createElement('th');el.textContent=c.t;el.style.textAlign=c.a;th.appendChild(el);
+});
+const htData=DEPT_STATS.map(d=>[d.attrR,+(d.avgRisk*100).toFixed(1),d.lowEng,d.belMkt,d.hpfr]);
+const ranges=HT_COLS.map((_,ci)=>{
+  const vs=htData.map(r=>r[ci]);
+  return{lo:Math.min(...vs),hi:Math.max(...vs)};
+});
+function htColor(v,lo,hi,isCount=false){
+  const t=(v-lo)/(hi-lo+0.001);
+  // Blue intensity: low = pale, high = deep blue
+  const r=Math.round(255-(t*140));
+  const g=Math.round(255-(t*100));
+  const b=Math.round(255-(t*20));
+  return`rgb(${r},${g},${b})`;
+}
+function textContrast(v,lo,hi){
+  const t=(v-lo)/(hi-lo+0.001);
+  return t>0.6?'#0c3a72':'#2a5080';
+}
+const tb2=tbl.createTBody();
+DEPT_STATS.forEach((d,ri)=>{
+  const tr=tb2.insertRow();
+  const td0=tr.insertCell();td0.textContent=d.dept;
+  htData[ri].forEach((v,ci)=>{
+    const td=tr.insertCell();
+    td.style.background=htColor(v,ranges[ci].lo,ranges[ci].hi);
+    td.style.color=textContrast(v,ranges[ci].lo,ranges[ci].hi);
+    td.style.fontWeight=v===Math.max(...htData.map(r=>r[ci]))?'700':'400';
+    td.textContent=ci<4?v+'%':v;
+  });
+});
+
+// ─── FLIGHT RISK TABLE ──────────────────────────
+const ft=document.getElementById('ftbl');
+const fhrow=ft.createTHead().insertRow();
+['Employee','Department','Role','Engagement','Flight Risk','Compa Ratio','TSP (mo)','Action'].forEach(h=>{
+  const el=document.createElement('th');el.textContent=h;fhrow.appendChild(el);
+});
+const fb=ft.createTBody();
+HPFR_DATA.forEach(e=>{
+  const tr=fb.insertRow();
+  const pct=Math.round(e.risk*100);
+  const barColor=pct>=70?'#d93b3b':pct>=55?'#d68400':'#2f72bc';
+  const actionCls=e.action==='Immediate retention intervention'?'critical':e.action==='Monitor closely'?'high':'moderate';
+  [
+    `<span class="mono">${e.id}</span>`,
+    e.dept,
+    e.jf,
+    `<span class="mono">${e.eng}</span>`,
+    `<div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${barColor}"></div></div><span class="mono">${pct}%</span></div>`,
+    `<span class="mono">${e.compa}</span>`,
+    `<span class="mono">${e.tsp}</span>`,
+    `<span class="badge badge-${actionCls}">${e.action}</span>`
+  ].forEach(html=>{
+    const td=tr.insertCell();td.innerHTML=html;
+  });
+});
+
+// ─── ENGAGEMENT DONUT ──────────────────────────
+const engLabels=['Critical (<40)','Low (40–55)','Moderate (55–70)','High (70–85)','Thriving (>85)'];
+const engColors=['#d93b3b','#d68400','#2f72bc','#1c8a54','#0891b2'];
+new Chart(document.getElementById('engChart'),{
+  type:'doughnut',
+  data:{
+    labels:engLabels,
+    datasets:[{
+      data:ENG_BANDS,
+      backgroundColor:engColors.map(c=>c+'cc'),
+      borderColor:engColors,
+      borderWidth:1.5,
+      hoverOffset:7
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    cutout:'66%',
+    animation:{duration:900,easing:'easeOutCubic'},
+    plugins:{
+      legend:{position:'right',labels:{boxWidth:11,padding:9,color:'#2a5080',font:{size:10}}},
+      tooltip:{
+        backgroundColor:'rgba(255,255,255,0.96)',titleColor:'#0e2444',bodyColor:'#2a5080',borderColor:'#c0d8ee',borderWidth:1,
+        callbacks:{label:ctx=>ctx.label+': '+ctx.raw+' empl. ('+((ctx.raw/10).toFixed(1))+'%)'}
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
