@@ -303,3 +303,19 @@ HumanCapitalDecisionIntelligence/
 ├── reports/
 ├── docs/
 └── README.md
+
+
+## Completed Module: Retention Intervention A/B Testing
+
+This module simulates an ethical A/B test for a targeted retention intervention among medium- to high-risk employees. Eligible employees were randomly assigned to standard HR support or an enhanced career-development intervention.
+
+The simulated pilot showed a meaningful engagement lift of approximately 4.6 points for the treatment group compared with the control group. Flight risk also decreased, while short-term attrition reduction was small and not statistically significant. This suggests the intervention improved leading workforce indicators, while actual attrition may require a longer observation window.
+
+### A/B Testing Outputs
+
+- [Experiment Design](https://phoenixcoder26.github.io/human-capital-decision-intelligence/08_ab_test_experiment_design.html)
+- [Balance Check](https://phoenixcoder26.github.io/human-capital-decision-intelligence/09_ab_test_balance_check.html)
+- [Engagement Lift](https://phoenixcoder26.github.io/human-capital-decision-intelligence/10_ab_test_engagement_lift.html)
+- [Attrition Impact](https://phoenixcoder26.github.io/human-capital-decision-intelligence/11_ab_test_attrition_impact.html)
+- [Treatment Effect Summary](https://phoenixcoder26.github.io/human-capital-decision-intelligence/12_ab_test_treatment_effect_summary.html)
+- [Segment Effects](https://phoenixcoder26.github.io/human-capital-decision-intelligence/13_ab_test_segment_effects.html)
