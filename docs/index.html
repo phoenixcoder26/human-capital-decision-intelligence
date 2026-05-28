@@ -99,6 +99,190 @@ table.ft tr:last-child td{border-bottom:none;}
 
 /* ── MAIN CONTAINER ──────────────── */
 .page{max-width:1400px;margin:0 auto;padding:18px 20px 0;}
+
+/* ── SECTION DIVIDER ─────────────── */
+.section-divider{
+  display:flex;align-items:center;gap:14px;
+  margin:32px 0 20px;
+}
+.section-divider-line{flex:1;height:1.5px;background:var(--border);}
+.section-divider-label{
+  font-family:'IBM Plex Mono',monospace;font-size:9px;
+  letter-spacing:.22em;color:var(--b500);
+  text-transform:uppercase;white-space:nowrap;
+  background:var(--b50);padding:0 4px;
+}
+
+/* ── KEY VISUAL RESULTS ──────────── */
+.kvr-header{
+  margin-bottom:18px;
+}
+.kvr-title{
+  font-size:20px;font-weight:800;color:var(--ink);
+  letter-spacing:-0.02em;line-height:1.1;
+  margin-bottom:4px;
+}
+.kvr-title span{color:var(--b400);}
+.kvr-sub{
+  font-size:12px;color:var(--ink4);
+  font-family:'IBM Plex Mono',monospace;
+  letter-spacing:.04em;
+}
+
+.kvr-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.kvr-card{
+  background:#fff;
+  border:1.5px solid var(--border2);
+  border-radius:14px;
+  padding:0;
+  box-shadow:var(--sh);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  animation:slide-up .5s ease both;
+}
+.kvr-card:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shl);
+  border-color:var(--b300);
+}
+
+.kvr-card-top{
+  padding:16px 18px 14px;
+  flex:1;
+  position:relative;
+}
+.kvr-card-top::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--card-accent,linear-gradient(90deg,var(--b400),var(--b300)));
+  border-radius:0;
+}
+
+.kvr-num{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;letter-spacing:.18em;
+  color:var(--ink4);text-transform:uppercase;
+  margin-bottom:8px;margin-top:4px;
+}
+.kvr-card-title{
+  font-size:13.5px;font-weight:700;color:var(--ink);
+  letter-spacing:-0.01em;margin-bottom:6px;
+  line-height:1.25;
+}
+.kvr-card-desc{
+  font-size:11.5px;color:var(--ink3);
+  line-height:1.55;
+}
+
+.kvr-card-icon{
+  width:36px;height:36px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;margin-bottom:10px;
+  background:var(--icon-bg,var(--b50));
+  border:1px solid var(--border2);
+  flex-shrink:0;
+}
+
+.kvr-card-footer{
+  padding:12px 18px;
+  border-top:1px solid var(--border2);
+  background:var(--surf0);
+}
+.kvr-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--b500);color:#fff;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  padding:8px 14px;border-radius:7px;
+  text-decoration:none;
+  transition:background .18s,transform .15s;
+  font-weight:500;
+}
+.kvr-btn:hover{background:var(--b600);transform:translateX(2px);}
+.kvr-btn svg{flex-shrink:0;}
+
+/* Card accent colour variants */
+.kvr-card:nth-child(1){--card-accent:linear-gradient(90deg,#1a6db8,#0891b2);}
+.kvr-card:nth-child(2){--card-accent:linear-gradient(90deg,#1a7a48,#2f8ddc);}
+.kvr-card:nth-child(3){--card-accent:linear-gradient(90deg,#2f8ddc,#6aaee6);}
+.kvr-card:nth-child(4){--card-accent:linear-gradient(90deg,#c97c00,#c8302a);}
+.kvr-card:nth-child(5){--card-accent:linear-gradient(90deg,#c8302a,#c97c00);}
+.kvr-card:nth-child(6){--card-accent:linear-gradient(90deg,#7c3aed,#2f8ddc);}
+
+.kvr-card:nth-child(1){animation-delay:.05s;}
+.kvr-card:nth-child(2){animation-delay:.10s;}
+.kvr-card:nth-child(3){animation-delay:.15s;}
+.kvr-card:nth-child(4){animation-delay:.20s;}
+.kvr-card:nth-child(5){animation-delay:.25s;}
+.kvr-card:nth-child(6){animation-delay:.30s;}
+
+/* ── FINDINGS SECTION ────────────── */
+.findings-wrap{
+  background:#fff;
+  border:1.5px solid var(--border2);
+  border-radius:16px;
+  padding:22px 26px;
+  box-shadow:var(--sh);
+  margin-bottom:16px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  animation:slide-up .5s ease .32s both;
+}
+.findings-col-head{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;letter-spacing:.18em;
+  color:var(--b400);text-transform:uppercase;
+  margin-bottom:12px;
+}
+.findings-title{
+  font-size:15px;font-weight:700;color:var(--ink);
+  margin-bottom:14px;letter-spacing:-0.01em;
+}
+.finding-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid var(--border2);
+}
+.finding-item:last-child{border-bottom:none;}
+.finding-dot{
+  width:7px;height:7px;border-radius:50%;
+  margin-top:5px;flex-shrink:0;
+}
+.finding-dot.blue{background:var(--b400);}
+.finding-dot.green{background:var(--green);}
+.finding-dot.amber{background:var(--amber);}
+.finding-dot.red{background:var(--red);}
+.finding-text{font-size:12.5px;color:var(--ink2);line-height:1.5;}
+.finding-value{
+  font-family:'IBM Plex Mono',monospace;
+  font-weight:600;color:var(--b500);
+  font-size:12px;
+}
+
+/* Stat pills in findings */
+.stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.stat-pill{
+  background:var(--surf1);border:1px solid var(--border);
+  border-radius:9px;padding:8px 14px;
+  text-align:center;
+}
+.stat-pill-val{
+  font-size:20px;font-weight:800;color:var(--b600);
+  letter-spacing:-0.02em;line-height:1;margin-bottom:2px;
+}
+.stat-pill-lbl{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:9px;color:var(--ink4);
+  letter-spacing:.1em;text-transform:uppercase;
+}
 </style>
 </head>
 <body>
@@ -237,6 +421,193 @@ table.ft tr:last-child td{border-bottom:none;}
     </div>
   </div>
 
+  <!-- ══ KEY VISUAL RESULTS ══════════════════════════════════════════════ -->
+  <div class="section-divider">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-label">A/B Testing Module · Key Visual Results</div>
+    <div class="section-divider-line"></div>
+  </div>
+
+  <div class="kvr-header">
+    <div class="kvr-title">Key <span>Visual</span> Results</div>
+    <div class="kvr-sub">Retention Intervention A/B Test · 533 eligible employees · synthetic_workforce.csv · R/03_ab_testing_retention_intervention.R</div>
+  </div>
+
+  <div class="kvr-grid">
+
+    <!-- Card 1 -->
+    <div class="kvr-card">
+      <div class="kvr-card-top">
+        <div class="kvr-card-icon" style="--icon-bg:#edf4fa;">📋</div>
+        <div class="kvr-num">01 · Experiment Design</div>
+        <div class="kvr-card-title">Experiment Design Summary</div>
+        <div class="kvr-card-desc">Documents the full A/B test protocol — eligibility rules, sample sizes, treatment assignment logic, outcome metrics, and statistical parameters used for the retention intervention evaluation.</div>
+      </div>
+      <div class="kvr-card-footer">
+        <a class="kvr-btn" href="08_ab_test_experiment_design.html" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Open Interactive Chart
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="kvr-card">
+      <div class="kvr-card-top">
+        <div class="kvr-card-icon" style="--icon-bg:#e6f7ee;">⚖️</div>
+        <div class="kvr-num">02 · Balance Check</div>
+        <div class="kvr-card-title">Pre-Intervention Balance Check</div>
+        <div class="kvr-card-desc">Confirms that random assignment worked correctly — treatment and control groups were statistically comparable on 14 pre-intervention characteristics including age, tenure, performance, engagement, and flight risk.</div>
+      </div>
+      <div class="kvr-card-footer">
+        <a class="kvr-btn" href="09_ab_test_balance_check.html" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Open Interactive Chart
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="kvr-card">
+      <div class="kvr-card-top">
+        <div class="kvr-card-icon" style="--icon-bg:#edf4fa;">📈</div>
+        <div class="kvr-num">03 · Engagement Lift</div>
+        <div class="kvr-card-title">Engagement Improvement by Group</div>
+        <div class="kvr-card-desc">The treatment group improved engagement by <strong>4.6 points more</strong> than control on average — a statistically significant and practically meaningful effect, with career-stalled and high-performing employees showing the strongest response.</div>
+      </div>
+      <div class="kvr-card-footer">
+        <a class="kvr-btn" href="10_ab_test_engagement_lift.html" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Open Interactive Chart
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="kvr-card">
+      <div class="kvr-card-top">
+        <div class="kvr-card-icon" style="--icon-bg:#fef6e4;">📉</div>
+        <div class="kvr-num">04 · Attrition Impact</div>
+        <div class="kvr-card-title">Post-Intervention Attrition Rate</div>
+        <div class="kvr-card-desc">Short-term attrition reduction in the treatment group was small and <strong>not statistically significant</strong> at 3 months — consistent with research showing engagement improvements precede attrition changes by 6–12 months.</div>
+      </div>
+      <div class="kvr-card-footer">
+        <a class="kvr-btn" href="11_ab_test_attrition_impact.html" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Open Interactive Chart
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="kvr-card">
+      <div class="kvr-card-top">
+        <div class="kvr-card-icon" style="--icon-bg:#fdecea;">📊</div>
+        <div class="kvr-num">05 · Treatment Effect Summary</div>
+        <div class="kvr-card-title">Executive Effect Size Summary</div>
+        <div class="kvr-card-desc">Full statistical results table with p-values, 95% confidence intervals, Cohen's d effect sizes, odds ratios from logistic regression, and business interpretation for each outcome — designed for executive review and HR decision-making.</div>
+      </div>
+      <div class="kvr-card-footer">
+        <a class="kvr-btn" href="12_ab_test_treatment_effect_summary.html" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Open Interactive Chart
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="kvr-card">
+      <div class="kvr-card-top">
+        <div class="kvr-card-icon" style="--icon-bg:#f3eeff;">🎯</div>
+        <div class="kvr-num">06 · Segment Effects</div>
+        <div class="kvr-card-title">Heterogeneous Treatment Effects by Segment</div>
+        <div class="kvr-card-desc"><strong>High-performing flight risks</strong> and <strong>career-stalled employees</strong> responded most strongly to the intervention — demonstrating that targeted deployment by segment yields better ROI than blanket application to the full at-risk population.</div>
+      </div>
+      <div class="kvr-card-footer">
+        <a class="kvr-btn" href="13_ab_test_segment_effects.html" target="_blank">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Open Interactive Chart
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /kvr-grid -->
+
+  <!-- ══ A/B TESTING KEY FINDINGS ═══════════════════════════════════════════ -->
+  <div class="section-divider">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-label">A/B Testing · Key Findings</div>
+    <div class="section-divider-line"></div>
+  </div>
+
+  <div class="findings-wrap">
+    <!-- Left column: stats + findings -->
+    <div>
+      <div class="findings-col-head">Experiment · At a Glance</div>
+      <div class="stat-row">
+        <div class="stat-pill">
+          <div class="stat-pill-val">533</div>
+          <div class="stat-pill-lbl">Eligible employees</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-val">266</div>
+          <div class="stat-pill-lbl">Treatment group</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-val">267</div>
+          <div class="stat-pill-lbl">Control group</div>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-pill-val">+4.6</div>
+          <div class="stat-pill-lbl">Engagement lift (pts)</div>
+        </div>
+      </div>
+
+      <div class="findings-title">Statistical Findings</div>
+
+      <div class="finding-item">
+        <div class="finding-dot blue"></div>
+        <div class="finding-text"><span class="finding-value">533 eligible employees</span> were selected from the 1,000-employee synthetic workforce dataset using flight risk, retention priority, career stall, and engagement criteria.</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-dot blue"></div>
+        <div class="finding-text"><span class="finding-value">266 treatment / 267 control</span> — groups were statistically balanced on all 14 pre-intervention characteristics, confirming valid randomisation.</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-dot green"></div>
+        <div class="finding-text">The enhanced intervention <span class="finding-value">improved engagement by +4.6 points</span> more than control — a statistically significant effect (p &lt; 0.001) with a medium Cohen's d effect size.</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-dot green"></div>
+        <div class="finding-text"><span class="finding-value">Flight risk decreased</span> in the treatment group post-intervention, with the reduction strongest among high-performing employees with high baseline risk scores.</div>
+      </div>
+    </div>
+
+    <!-- Right column: interpretation -->
+    <div>
+      <div class="findings-col-head">Business Interpretation</div>
+      <div class="findings-title">What the Results Mean for HR</div>
+
+      <div class="finding-item">
+        <div class="finding-dot amber"></div>
+        <div class="finding-text"><span class="finding-value">Short-term attrition reduction was small and not statistically significant</span> — this is expected at 3 months, as engagement improvements typically precede attrition changes by 6–12 months.</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-dot blue"></div>
+        <div class="finding-text"><span class="finding-value">High-performing flight risks and career-stalled employees</span> responded most strongly — suggesting the intervention should be prioritised for these two segments rather than applied uniformly.</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-dot green"></div>
+        <div class="finding-text">The engagement improvement is a <span class="finding-value">leading indicator</span> — HR leaders should monitor the treatment cohort for 6–12 months to capture the full attrition impact before scaling the programme.</div>
+      </div>
+      <div class="finding-item">
+        <div class="finding-dot amber"></div>
+        <div class="finding-text"><span class="finding-value">Next steps:</span> Scale to the full eligible population with segment-priority ordering, run a second randomised cohort to confirm external validity, and integrate findings into the causal inference module.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════════════════ -->
   <div class="footer">
     <span>HCDIS · Human Capital Decision Intelligence System · Farzana Khan Moutushi · All data synthetic — portfolio demonstration only</span>
     <span>Refresh in <span id="cd">30</span>s · <span id="ts2">—</span></span>
