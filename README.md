@@ -245,6 +245,8 @@ In the simulated data, engagement and flight-risk scores differed between groups
 
 In the simulated data, the treatment group showed higher engagement change and a larger flight-risk score decrease than the control group (both p < 0.001). The observed attrition rate difference was small and not statistically significant, so the simulation does not show an effect on attrition. These are simulated findings about how the analysis would work, not evidence that a retention program works in a real organization; a real pilot with a longer follow-up window would be needed to test whether engagement or risk changes translate into lower attrition.
 
+**Why attrition may have been missed.** "Not significant" does not mean "no effect". With about 266 employees per group and a 14.6% control-group attrition rate, a two-group z-test (5% significance) catches a true drop of about **7.5 percentage points** 80% of the time. The simulation script modeled an average drop of about 6.8 points (12.8% vs 19.6% modeled attrition probability), which a test this size would catch roughly 71% of the time. The attrition result therefore shows the sample was too small to tell, not that the intervention does nothing. The homepage includes an interactive power explainer for this.
+
 In the simulation, the largest engagement differences appeared among:
 
 * high-performing flight risks
