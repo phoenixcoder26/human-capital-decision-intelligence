@@ -7,17 +7,21 @@
 <title>HCDIS · Workforce Intelligence Command Center</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
+  --bg:#eef5fc;--paper:#ffffff;--ink:#08244a;--ink2:#1a3f6e;--ink3:#3a6090;--ink4:#6898c0;
+  --line:#c8ddf0;--line2:#ddeaf6;--wash:#f5f9fd;
+  --teal:#1a6db8;--teal-d:#12519a;--teal-l:#d3e6f8;
+  --amber:#e0990f;--ambl:#fdf1d6;--red:#d2411e;--redl:#fbe6df;--deep:#8e1b1b;--green:#2f7d4f;--grnl:#e2f1e8;
   --b50:#eef5fc;--b100:#d3e6f8;--b200:#a8cdf0;--b300:#6aaee6;--b400:#2f8ddc;--b500:#1a6db8;--b600:#12519a;--b700:#0c3c78;--b800:#082c5a;
-  --ink:#08244a;--ink2:#1a3f6e;--ink3:#3a6090;--ink4:#6898c0;
-  --border:#c8ddf0;--border2:#ddeef8;--surf0:#f5f9fd;--surf1:#edf4fa;--surf2:rgba(255,255,255,0.95);
-  --red:#c8302a;--redl:#fdecea;--amber:#c97c00;--ambl:#fef6e4;--green:#1a7a48;--grnl:#e6f7ee;
-  --sh:0 1px 8px rgba(8,44,90,0.08);--shl:0 4px 20px rgba(8,44,90,0.12);
+  --serif:'Instrument Serif',Georgia,serif;--sans:'Instrument Sans',system-ui,sans-serif;
 }
-html,body{background:var(--b50);font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);line-height:1.5;overflow-x:hidden}
+html,body{background:var(--bg);font-family:var(--sans);font-size:15px;color:var(--ink);line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.page{max-width:1280px;margin:0 auto;padding:28px 28px 0}
 
+/* ORIGINAL HERO — blue animated hero with the working employee */
 /* ── HERO ─────────────────────────── */
 .hero{
   position:relative;overflow:hidden;
@@ -36,253 +40,141 @@ html,body{background:var(--b50);font-family:'Outfit',sans-serif;font-size:14px;c
 .hkpi-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,0.55);text-transform:uppercase;margin-bottom:4px;}
 .hkpi-val{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1;}
 .hkpi-delta{font-size:10px;margin-top:3px;}
-.hkpi-delta.up{color:#ffb3b3;}.hkpi-delta.dn{color:#a0f0c0;}.hkpi-delta.nt{color:rgba(255,255,255,0.4);}
-.live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(30,200,100,0.15);border:1px solid rgba(30,200,100,0.3);border-radius:20px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6ff0a0;letter-spacing:.12em;}
-.live-dot{width:6px;height:6px;border-radius:50%;background:#50e090;animation:beat 2s ease-in-out infinite;}
-@keyframes beat{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-.hero-ts{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px;letter-spacing:.06em;}
+.hkpi-delta{color:rgba(255,255,255,0.6);}
+.live-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#d6efff;letter-spacing:.12em;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#7fd0ff;}
+.hero-ts-unused{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px;letter-spacing:.06em;}
 
 /* ── WORKER SVG ──────────────────── */
-.worker-scene{position:absolute;bottom:0;right:3%;width:260px;opacity:0.18;pointer-events:none;}
+.worker-scene{position:absolute;bottom:0;right:4%;width:250px;opacity:1;pointer-events:none;}
 .worker-scene svg{width:100%;height:auto;}
 @keyframes type-h{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @keyframes bob-h{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
 @keyframes scr-glow{0%,100%{opacity:.65}50%{opacity:1}}
-.w-hands{animation:type-h .5s ease-in-out infinite;transform-origin:50% 85%;}
-.w-head{animation:bob-h 3s ease-in-out infinite;transform-origin:50% 100%;}
+.w-hands{animation:type-h .45s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%;}
+.w-head{animation:bob-h 3s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%;}
 .w-screen{animation:scr-glow 2s ease-in-out infinite;}
 
 /* ── PARTICLES ───────────────────── */
 .particle{position:absolute;border-radius:50%;background:rgba(127,208,255,0.6);opacity:0;animation:pfloat 7s ease-in-out infinite;}
 @keyframes pfloat{0%{opacity:0;transform:translateY(0) scale(1)}20%{opacity:.25}80%{opacity:.08}100%{opacity:0;transform:translateY(-130px) scale(.4)}}
 
-/* ── LAYOUT ──────────────────────── */
-.wrap{padding:0 0 32px;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
-.g3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px;}
+/* DOT FIELD SECTION */
+.dotsec{display:grid;grid-template-columns:minmax(280px,400px) 1fr;gap:36px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:26px 28px;margin-bottom:20px}
+.dotsec-title{font-family:var(--serif);font-weight:400;font-size:40px;line-height:1;letter-spacing:-.01em;color:var(--ink)}
+.dotsec-lead{margin-top:12px;font-size:14.5px;line-height:1.55;color:var(--ink2);max-width:42ch}
+.view-switch{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+.view-switch button{font:inherit;font-size:13px;font-weight:500;color:var(--ink2);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.view-switch button:hover{border-color:var(--teal)}
+.view-switch button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:14px;min-height:42px;font-size:12.5px;color:var(--ink3)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:11px;height:11px;border-radius:50%;display:inline-block;flex-shrink:0}
+.legend i.ring{background:transparent;border:2px solid var(--teal)}
+.dotwrap{position:relative;width:100%;height:400px}
+#dotField{width:100%;height:100%;display:block}
+.dot-tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;padding:5px 9px;border-radius:5px;white-space:nowrap;opacity:0;transform:translate(-50%,-130%);transition:opacity .12s}
 
-/* ── PANEL ───────────────────────── */
-.panel{background:var(--surf2);border:1px solid var(--border2);border-radius:16px;padding:18px 20px;box-shadow:var(--sh);animation:slide-up .5s ease both;}
-@keyframes slide-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.panel-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--b400);text-transform:uppercase;margin-bottom:4px;}
-.panel-title{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;margin-bottom:2px;}
-.panel-sub{font-size:11px;color:var(--ink4);font-family:'IBM Plex Mono',monospace;margin-bottom:14px;}
-.cbox{position:relative;height:260px;}.cbox-sm{position:relative;height:230px;}
+/* LAYOUT */
+.wrap{padding:26px 0 36px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.g3{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:22px 24px}
+.panel-tag{display:none}
+.panel-title{font-family:var(--serif);font-size:26px;line-height:1.1;color:var(--ink);letter-spacing:-.005em}
+.panel-sub{font-size:13px;color:var(--ink3);margin:4px 0 14px;max-width:70ch}
+.cbox{position:relative;height:300px}.cbox-sm{position:relative;height:230px}
 
-/* ── HEATMAP ─────────────────────── */
-table.ht{width:100%;border-collapse:collapse;font-size:11.5px;}
-table.ht th{padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;text-align:center;border-bottom:1.5px solid var(--border);background:var(--surf1);white-space:nowrap;}
-table.ht th:first-child{text-align:left;}
-table.ht td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--border2);font-family:'IBM Plex Mono',monospace;font-size:11px;transition:filter .15s;}
-table.ht td:first-child{text-align:left;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--ink);}
-table.ht tr:hover td{filter:brightness(.93);}
+/* HEATMAP TABLE */
+table.ht{width:100%;border-collapse:separate;border-spacing:2px;font-size:13px}
+table.ht th{padding:6px 10px;font-size:12px;font-weight:600;color:var(--ink3);text-align:center;white-space:nowrap}
+table.ht th:first-child{text-align:left}
+table.ht td{padding:9px 10px;text-align:center;font-variant-numeric:tabular-nums;border-radius:3px}
+table.ht td:first-child{text-align:left;font-weight:600;color:var(--ink);background:transparent!important}
 
-/* ── FLIGHT RISK TABLE ───────────── */
-.ftw{overflow-x:auto;max-height:280px;overflow-y:auto;}
-table.ft{width:100%;border-collapse:collapse;font-size:11.5px;}
-table.ft th{padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;text-align:left;border-bottom:1.5px solid var(--border);position:sticky;top:0;background:var(--surf1);z-index:1;white-space:nowrap;}
-table.ft td{padding:8px 10px;border-bottom:1px solid var(--border2);color:var(--ink);vertical-align:middle;}
-table.ft tr:hover td{background:var(--surf0);}
-table.ft tr:last-child td{border-bottom:none;}
-.badge{display:inline-block;padding:2px 8px;border-radius:5px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase;font-weight:500;white-space:nowrap;}
-.bc{background:var(--redl);color:var(--red);border:1px solid #f8c4c4;}
-.bh{background:var(--ambl);color:var(--amber);border:1px solid #f5dea0;}
-.bm{background:#e4eef8;color:var(--b500);border:1px solid var(--b100);}
-.bg2{background:var(--grnl);color:var(--green);border:1px solid #b8e8cc;}
-.bw{display:flex;align-items:center;gap:6px;}.bb{flex:1;height:5px;background:var(--b100);border-radius:3px;overflow:hidden;}
-.bf{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
-.mono{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink3);}
+/* REGISTRY TABLE */
+.ftw{overflow:auto;max-height:300px}
+table.ft{width:100%;border-collapse:collapse;font-size:13px}
+table.ft th{padding:7px 10px;font-size:12px;font-weight:600;color:var(--ink3);text-align:left;border-bottom:1px solid var(--ink);position:sticky;top:0;background:var(--paper);z-index:1;white-space:nowrap}
+table.ft td{padding:8px 10px;border-bottom:1px solid var(--line2);color:var(--ink);vertical-align:middle}
+table.ft tr:hover td{background:var(--wash)}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.bc{background:var(--redl);color:var(--red)}.bh{background:var(--ambl);color:#8a5a00}.bm{background:var(--teal-l);color:var(--teal-d)}.bg2{background:var(--grnl);color:var(--green)}
+.bw{display:flex;align-items:center;gap:8px}.bb{flex:1;height:5px;background:var(--line2);border-radius:3px;overflow:hidden;min-width:44px}
+.bf{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.mono{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
 
-/* ── FOOTER ──────────────────────── */
-.footer{margin-top:20px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
-.footer span{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink4);letter-spacing:.06em;}
+/* SECTIONS */
+.section-divider{margin:44px 0 18px;display:flex;align-items:baseline;gap:14px;border-top:1px solid var(--ink);padding-top:10px}
+.section-divider-line{display:none}
+.section-divider-label{font-size:13px;font-weight:600;color:var(--ink)}
+.kvr-header{margin-bottom:20px}
+.kvr-title{font-family:var(--serif);font-weight:400;font-size:44px;line-height:1;letter-spacing:-.01em;color:var(--ink)}
+.kvr-sub{font-size:13px;color:var(--ink3);margin-top:8px;max-width:90ch}
+.kvr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px}
+.kvr-card{background:var(--paper);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;overflow:hidden;transition:border-color .2s}
+.kvr-card:hover{border-color:var(--teal)}
+.kvr-card-top{padding:20px 22px 16px;flex:1;border-top:4px solid var(--card-accent,var(--teal))}
+.kvr-card:nth-child(1){--card-accent:#1a6db8}.kvr-card:nth-child(2){--card-accent:#2f7d4f}.kvr-card:nth-child(3){--card-accent:#3a8f9a}
+.kvr-card:nth-child(4){--card-accent:#e0990f}.kvr-card:nth-child(5){--card-accent:#d2411e}.kvr-card:nth-child(6){--card-accent:#5b4a8c}
+.kvr-card-icon{display:none}
+.kvr-num{font-size:12.5px;color:var(--ink3);margin-bottom:6px}
+.kvr-card-title{font-family:var(--serif);font-size:24px;line-height:1.1;color:var(--ink);margin-bottom:8px}
+.kvr-card-desc{font-size:13.5px;color:var(--ink2);line-height:1.55}
+.kvr-card-footer{padding:12px 22px 16px}
+.kvr-btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--teal-d);text-decoration:none;border-bottom:2px solid var(--teal);padding-bottom:1px;transition:color .15s,gap .15s}
+.kvr-btn:hover{color:var(--ink);gap:11px}
+.kvr-btn svg{display:none}
 
-/* ── MAIN CONTAINER ──────────────── */
-.page{max-width:1400px;margin:0 auto;padding:18px 20px 0;}
+/* FINDINGS */
+.findings-wrap{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:26px 28px;display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:20px}
+.findings-col-head{font-size:13px;font-weight:600;color:var(--teal-d);margin-bottom:4px}
+.findings-title{font-family:var(--serif);font-size:30px;line-height:1.1;color:var(--ink);margin-bottom:14px}
+.finding-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--line2)}
+.finding-item:last-child{border-bottom:none}
+.finding-dot{width:8px;height:8px;border-radius:50%;margin-top:7px;flex-shrink:0}
+.finding-dot.blue{background:var(--teal)}.finding-dot.green{background:var(--green)}.finding-dot.amber{background:var(--amber)}.finding-dot.red{background:var(--red)}
+.finding-text{font-size:14px;color:var(--ink2);line-height:1.55;max-width:62ch}
+.finding-value{font-weight:700;color:var(--ink)}
+.stat-row{display:flex;gap:28px;flex-wrap:wrap;margin:10px 0 22px}
+.stat-pill{text-align:left}
+.stat-pill-val{font-family:var(--serif);font-size:44px;line-height:1;color:var(--teal-d);font-variant-numeric:tabular-nums}
+.stat-pill-lbl{font-size:12.5px;color:var(--ink3);margin-top:2px}
 
-/* ── SECTION DIVIDER ─────────────── */
-.section-divider{
-  display:flex;align-items:center;gap:14px;
-  margin:32px 0 20px;
-}
-.section-divider-line{flex:1;height:1.5px;background:var(--border);}
-.section-divider-label{
-  font-family:'IBM Plex Mono',monospace;font-size:9px;
-  letter-spacing:.22em;color:var(--b500);
-  text-transform:uppercase;white-space:nowrap;
-  background:var(--b50);padding:0 4px;
-}
+.footer{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink3)}
 
-/* ── KEY VISUAL RESULTS ──────────── */
-.kvr-header{
-  margin-bottom:18px;
+/* ONE ENTRANCE: the dot field draws itself in (JS). Everything else stays still. */
+@media (max-width:1150px){.worker-scene{display:none}}
+@media (max-width:980px){
+  .dotsec{grid-template-columns:1fr;gap:18px;padding:20px 18px}
+  .dotwrap{height:340px}
+  .worker-scene{display:none}
+  .g2,.g3,.kvr-grid,.findings-wrap{grid-template-columns:1fr}
+  .findings-wrap{gap:22px}
+  .page{padding:20px 16px 0}
 }
-.kvr-title{
-  font-size:20px;font-weight:800;color:var(--ink);
-  letter-spacing:-0.02em;line-height:1.1;
-  margin-bottom:4px;
-}
-.kvr-title span{color:var(--b400);}
-.kvr-sub{
-  font-size:12px;color:var(--ink4);
-  font-family:'IBM Plex Mono',monospace;
-  letter-spacing:.04em;
-}
-
-.kvr-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin-bottom:20px;
-}
-
-.kvr-card{
-  background:#fff;
-  border:1.5px solid var(--border2);
-  border-radius:14px;
-  padding:0;
-  box-shadow:var(--sh);
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  transition:transform .2s,box-shadow .2s,border-color .2s;
-  animation:slide-up .5s ease both;
-}
-.kvr-card:hover{
-  transform:translateY(-3px);
-  box-shadow:var(--shl);
-  border-color:var(--b300);
-}
-
-.kvr-card-top{
-  padding:16px 18px 14px;
-  flex:1;
-  position:relative;
-}
-.kvr-card-top::before{
-  content:'';
-  position:absolute;top:0;left:0;right:0;height:3px;
-  background:var(--card-accent,linear-gradient(90deg,var(--b400),var(--b300)));
-  border-radius:0;
-}
-
-.kvr-num{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:9px;letter-spacing:.18em;
-  color:var(--ink4);text-transform:uppercase;
-  margin-bottom:8px;margin-top:4px;
-}
-.kvr-card-title{
-  font-size:13.5px;font-weight:700;color:var(--ink);
-  letter-spacing:-0.01em;margin-bottom:6px;
-  line-height:1.25;
-}
-.kvr-card-desc{
-  font-size:11.5px;color:var(--ink3);
-  line-height:1.55;
-}
-
-.kvr-card-icon{
-  width:36px;height:36px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:17px;margin-bottom:10px;
-  background:var(--icon-bg,var(--b50));
-  border:1px solid var(--border2);
-  flex-shrink:0;
-}
-
-.kvr-card-footer{
-  padding:12px 18px;
-  border-top:1px solid var(--border2);
-  background:var(--surf0);
-}
-.kvr-btn{
-  display:inline-flex;align-items:center;gap:7px;
-  background:var(--b500);color:#fff;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-  padding:8px 14px;border-radius:7px;
-  text-decoration:none;
-  transition:background .18s,transform .15s;
-  font-weight:500;
-}
-.kvr-btn:hover{background:var(--b600);transform:translateX(2px);}
-.kvr-btn svg{flex-shrink:0;}
-
-/* Card accent colour variants */
-.kvr-card:nth-child(1){--card-accent:linear-gradient(90deg,#1a6db8,#0891b2);}
-.kvr-card:nth-child(2){--card-accent:linear-gradient(90deg,#1a7a48,#2f8ddc);}
-.kvr-card:nth-child(3){--card-accent:linear-gradient(90deg,#2f8ddc,#6aaee6);}
-.kvr-card:nth-child(4){--card-accent:linear-gradient(90deg,#c97c00,#c8302a);}
-.kvr-card:nth-child(5){--card-accent:linear-gradient(90deg,#c8302a,#c97c00);}
-.kvr-card:nth-child(6){--card-accent:linear-gradient(90deg,#7c3aed,#2f8ddc);}
-
-.kvr-card:nth-child(1){animation-delay:.05s;}
-.kvr-card:nth-child(2){animation-delay:.10s;}
-.kvr-card:nth-child(3){animation-delay:.15s;}
-.kvr-card:nth-child(4){animation-delay:.20s;}
-.kvr-card:nth-child(5){animation-delay:.25s;}
-.kvr-card:nth-child(6){animation-delay:.30s;}
-
-/* ── FINDINGS SECTION ────────────── */
-.findings-wrap{
-  background:#fff;
-  border:1.5px solid var(--border2);
-  border-radius:16px;
-  padding:22px 26px;
-  box-shadow:var(--sh);
-  margin-bottom:16px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:24px;
-  animation:slide-up .5s ease .32s both;
-}
-.findings-col-head{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:9px;letter-spacing:.18em;
-  color:var(--b400);text-transform:uppercase;
-  margin-bottom:12px;
-}
-.findings-title{
-  font-size:15px;font-weight:700;color:var(--ink);
-  margin-bottom:14px;letter-spacing:-0.01em;
-}
-.finding-item{
-  display:flex;align-items:flex-start;gap:10px;
-  padding:9px 0;
-  border-bottom:1px solid var(--border2);
-}
-.finding-item:last-child{border-bottom:none;}
-.finding-dot{
-  width:7px;height:7px;border-radius:50%;
-  margin-top:5px;flex-shrink:0;
-}
-.finding-dot.blue{background:var(--b400);}
-.finding-dot.green{background:var(--green);}
-.finding-dot.amber{background:var(--amber);}
-.finding-dot.red{background:var(--red);}
-.finding-text{font-size:12.5px;color:var(--ink2);line-height:1.5;}
-.finding-value{
-  font-family:'IBM Plex Mono',monospace;
-  font-weight:600;color:var(--b500);
-  font-size:12px;
-}
-
-/* Stat pills in findings */
-.stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
-.stat-pill{
-  background:var(--surf1);border:1px solid var(--border);
-  border-radius:9px;padding:8px 14px;
-  text-align:center;
-}
-.stat-pill-val{
-  font-size:20px;font-weight:800;color:var(--b600);
-  letter-spacing:-0.02em;line-height:1;margin-bottom:2px;
-}
-.stat-pill-lbl{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:9px;color:var(--ink4);
-  letter-spacing:.1em;text-transform:uppercase;
-}
+/* STATS LAB — animated statistical findings */
+.lab-note{font-size:13px;color:var(--ink3);margin:-4px 0 16px;max-width:90ch}
+.lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.lab-panel{min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px 22px 16px;display:flex;flex-direction:column}
+.lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.lab-title{font-family:var(--serif);font-size:25px;line-height:1.1;color:var(--ink)}
+.lab-q{font-size:13px;color:var(--ink3);margin:4px 0 10px;max-width:60ch}
+.lab-replay{font:inherit;font-size:12.5px;font-weight:600;color:var(--teal-d);background:none;border:none;border-bottom:1.5px solid var(--teal);padding:0 0 1px;cursor:pointer;white-space:nowrap}
+.lab-replay:hover{color:var(--ink)}
+.lab-svg{width:100%;height:auto;display:block}
+.lab-svg text{font-family:var(--sans);font-size:12px;fill:var(--ink2)}
+.lab-svg .mut{fill:var(--ink3)}
+.lab-svg .strong{font-weight:700;fill:var(--ink)}
+.lab-svg .axis{stroke:var(--line);stroke-width:1}
+.lab-svg .null{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:3 3}
+.lab-cap{font-size:13.5px;color:var(--ink2);line-height:1.5;margin-top:8px;min-height:42px}
+.lab-cap b{color:var(--ink)}
+.lab-tabs{display:flex;gap:6px;margin-bottom:6px}
+.lab-tabs button{font:inherit;font-size:12.5px;font-weight:500;color:var(--ink2);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.lab-tabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+@media (max-width:980px){.lab-grid{grid-template-columns:1fr}}
+@media (max-width:640px){.lab-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.lab-svg{min-width:520px}.lab-cap{min-height:0}}
 </style>
 </head>
 <body>
@@ -300,97 +192,88 @@ table.ft tr:last-child td{border-bottom:none;}
 
   <!-- Animated Office Worker -->
   <div class="worker-scene">
-    <svg viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="30" y="270" width="240" height="14" rx="4" fill="#7aaacf"/>
-      <rect x="50" y="284" width="8" height="100" rx="3" fill="#5a90bb"/>
-      <rect x="242" y="284" width="8" height="100" rx="3" fill="#5a90bb"/>
-      <rect x="118" y="258" width="14" height="14" rx="2" fill="#5a90bb"/>
-      <rect x="108" y="269" width="34" height="5" rx="2" fill="#4a80aa"/>
-      <rect x="78" y="190" width="94" height="70" rx="6" fill="#2a6090"/>
-      <defs>
-        <linearGradient id="sg" x1="78" y1="190" x2="172" y2="260" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#3a80cc"/><stop offset="100%" stop-color="#1a5090"/>
-        </linearGradient>
-      </defs>
-      <rect x="78" y="190" width="94" height="70" rx="6" fill="url(#sg)"/>
-      <g class="w-screen">
-        <rect x="86" y="198" width="50" height="4" rx="2" fill="#7ec8f0" opacity=".8"/>
-        <rect x="86" y="206" width="36" height="3" rx="1.5" fill="#60b0e0" opacity=".6"/>
-        <rect x="86" y="213" width="60" height="3" rx="1.5" fill="#50a0d0" opacity=".5"/>
-        <rect x="86" y="220" width="44" height="3" rx="1.5" fill="#60b0e0" opacity=".6"/>
-        <rect x="86" y="227" width="32" height="8" rx="2" fill="#3a90d8" opacity=".7"/>
-        <rect x="124" y="227" width="28" height="8" rx="2" fill="#2a80c8" opacity=".5"/>
-        <rect x="86" y="239" width="70" height="12" rx="3" fill="#1a70b8" opacity=".5"/>
-      </g>
-      <rect x="108" y="310" width="34" height="55" rx="8" fill="#4a85bb"/>
-      <rect x="112" y="365" width="26" height="8" rx="3" fill="#3a75aa"/>
-      <rect x="96" y="355" width="58" height="18" rx="8" fill="#5a95cc"/>
-      <line x1="105" y1="372" x2="88" y2="395" stroke="#4a80aa" stroke-width="5" stroke-linecap="round"/>
-      <line x1="145" y1="372" x2="162" y2="395" stroke="#4a80aa" stroke-width="5" stroke-linecap="round"/>
-      <line x1="125" y1="374" x2="125" y2="396" stroke="#4a80aa" stroke-width="5" stroke-linecap="round"/>
-      <rect x="108" y="265" width="34" height="50" rx="10" fill="#4a8acc"/>
-      <rect x="118" y="265" width="14" height="10" rx="3" fill="#6aaae0"/>
+    <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration of a person typing at a laptop">
+      <!-- desk -->
+      <rect x="10" y="262" width="280" height="10" rx="3" fill="#eaf4ff"/>
+      <rect x="26" y="272" width="8" height="28" fill="#cfe3f7"/><rect x="266" y="272" width="8" height="28" fill="#cfe3f7"/>
+      <!-- chair back -->
+      <rect x="92" y="126" width="116" height="140" rx="34" fill="#e8a838"/>
+      <!-- arms (behind laptop) -->
       <g class="w-hands">
-        <path d="M108 285 Q85 290 72 278" stroke="#4a8acc" stroke-width="9" stroke-linecap="round" fill="none"/>
-        <ellipse cx="70" cy="276" rx="8" ry="5" fill="#5a9ad8" transform="rotate(-20 70 276)"/>
-        <path d="M142 285 Q162 290 175 278" stroke="#4a8acc" stroke-width="9" stroke-linecap="round" fill="none"/>
-        <ellipse cx="177" cy="276" rx="8" ry="5" fill="#5a9ad8" transform="rotate(20 177 276)"/>
+        <path d="M114 152 Q76 190 104 238" stroke="#ff8a5b" stroke-width="17" stroke-linecap="round" fill="none"/>
+        <path d="M186 152 Q224 190 196 238" stroke="#ff8a5b" stroke-width="17" stroke-linecap="round" fill="none"/>
       </g>
-      <rect x="64" y="263" width="60" height="9" rx="3" fill="#3a75aa" opacity=".8"/>
-      <rect x="126" y="263" width="60" height="9" rx="3" fill="#3a75aa" opacity=".8"/>
+      <!-- torso -->
+      <rect x="104" y="128" width="92" height="100" rx="30" fill="#ff8a5b"/>
+      <path d="M134 128 Q150 146 166 128Z" fill="#ffd2bd"/>
+      <!-- head -->
       <g class="w-head">
-        <ellipse cx="125" cy="248" rx="18" ry="20" fill="#5a9ad8"/>
-        <ellipse cx="125" cy="232" rx="18" ry="8" fill="#2a5080"/>
-        <rect x="107" y="232" width="36" height="8" fill="#2a5080"/>
-        <ellipse cx="119" cy="248" rx="2.5" ry="2.5" fill="#1a4070" opacity=".8"/>
-        <ellipse cx="131" cy="248" rx="2.5" ry="2.5" fill="#1a4070" opacity=".8"/>
-        <path d="M119 255 Q125 259 131 255" stroke="#1a4070" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".7"/>
-        <rect x="115" y="245" width="9" height="6" rx="2" fill="none" stroke="#1a4070" stroke-width="1.2" opacity=".6"/>
-        <rect x="126" y="245" width="9" height="6" rx="2" fill="none" stroke="#1a4070" stroke-width="1.2" opacity=".6"/>
-        <line x1="124" y1="248" x2="126" y2="248" stroke="#1a4070" stroke-width="1.2" opacity=".6"/>
+        <rect x="140" y="108" width="20" height="24" rx="6" fill="#f1c4a4"/>
+        <ellipse cx="150" cy="88" rx="27" ry="30" fill="#ffd9b8"/>
+        <path d="M121 88 Q119 54 150 54 Q181 54 179 88 Q172 70 150 70 Q128 70 121 88Z" fill="#08244a"/>
+        <path d="M179 82 Q196 96 188 128" stroke="#08244a" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <circle cx="139" cy="92" r="2.6" fill="#3a2a20"/><circle cx="161" cy="92" r="2.6" fill="#3a2a20"/>
+        <path d="M141 104 Q150 111 159 104" stroke="#3a2a20" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <circle cx="132" cy="101" r="4" fill="#ff9d8a" opacity=".55"/><circle cx="168" cy="101" r="4" fill="#ff9d8a" opacity=".55"/>
+        <g class="w-screen"><ellipse cx="150" cy="106" rx="30" ry="16" fill="#7fd0ff" opacity=".28"/></g>
       </g>
-      <rect x="195" y="260" width="16" height="12" rx="3" fill="#c8dff0"/>
-      <path d="M211 264 Q217 264 217 268 Q217 272 211 272" stroke="#a8c8e0" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M199 257 Q201 253 199 249" stroke="#90b8d8" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".6"/>
-      <path d="M204 256 Q206 252 204 248" stroke="#90b8d8" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"/>
-      <rect x="218" y="254" width="12" height="16" rx="3" fill="#3a75aa"/>
-      <ellipse cx="224" cy="250" rx="10" ry="8" fill="#2d8a4e" opacity=".85"/>
-      <ellipse cx="218" cy="252" rx="7" ry="6" fill="#36a05a" opacity=".85"/>
-      <ellipse cx="230" cy="252" rx="7" ry="6" fill="#36a05a" opacity=".85"/>
+      <!-- laptop (lid seen from behind) -->
+      <rect x="82" y="176" width="136" height="84" rx="8" fill="#f4f8fc" stroke="#b9d3ee" stroke-width="2"/>
+      <circle cx="150" cy="218" r="8" fill="#1a6db8"/>
+      <rect x="68" y="258" width="164" height="8" rx="4" fill="#cfe3f7"/>
+      <!-- mug -->
+      <rect x="240" y="234" width="24" height="28" rx="5" fill="#ffffff"/>
+      <path d="M264 242 Q274 242 274 250 Q274 258 264 258" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <g class="w-screen"><path d="M248 226 Q252 218 248 210" stroke="#cfe9ff" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M256 226 Q260 218 256 210" stroke="#cfe9ff" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+      <!-- plant -->
+      <rect x="28" y="236" width="26" height="26" rx="4" fill="#e0703f"/>
+      <ellipse cx="41" cy="226" rx="12" ry="11" fill="#36a05a"/><ellipse cx="31" cy="231" rx="8" ry="7" fill="#2d8a4e"/><ellipse cx="51" cy="231" rx="8" ry="7" fill="#2d8a4e"/>
     </svg>
   </div>
 
   <div class="hero-content">
     <div class="hero-left">
-      <div class="hero-eyebrow">Human Capital Decision Intelligence System · v2.4 · Real Data</div>
+      <div class="hero-eyebrow">Human Capital Decision Intelligence System · Synthetic data</div>
       <div class="hero-title">Workforce <span class="accent">Intelligence</span><br>Command Center</div>
-      <div class="hero-sub">synthetic_workforce.csv · N = 1,000 employees · FY 2024</div>
-      <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
-        <div class="live-pill"><div class="live-dot"></div>LIVE SYNC</div>
-        <div class="hero-ts" id="hts">—</div>
-      </div>
+      <div class="hero-sub">synthetic_workforce.csv · N = 1,000 synthetic employees</div>
+      <div style="margin-top:10px;"><div class="live-pill"><div class="live-dot"></div>Synthetic data · portfolio demo</div></div>
     </div>
     <div class="hero-kpis">
-      <div class="hkpi"><div class="hkpi-lbl">Total workforce</div><div class="hkpi-val">1,000</div><div class="hkpi-delta nt">↔ stable headcount</div></div>
-      <div class="hkpi"><div class="hkpi-lbl">Attrition rate</div><div class="hkpi-val">15.4%</div><div class="hkpi-delta up">↑ +2.1pp vs prior yr</div></div>
-      <div class="hkpi"><div class="hkpi-lbl">Avg engagement</div><div class="hkpi-val">67.3</div><div class="hkpi-delta up">↓ −3.2 below target</div></div>
-      <div class="hkpi"><div class="hkpi-lbl">HP flight risks</div><div class="hkpi-val">36</div><div class="hkpi-delta up">↑ critical priority</div></div>
-      <div class="hkpi"><div class="hkpi-lbl">Replacement exposure</div><div class="hkpi-val">$6.1M</div><div class="hkpi-delta up">↑ cost of inaction</div></div>
+      <div class="hkpi"><div class="hkpi-lbl">Total workforce</div><div class="hkpi-val">1,000</div><div class="hkpi-delta">synthetic employees</div></div>
+      <div class="hkpi"><div class="hkpi-lbl">Attrition rate</div><div class="hkpi-val">15.4%</div><div class="hkpi-delta">154 of 1,000 left</div></div>
+      <div class="hkpi"><div class="hkpi-lbl">Avg engagement</div><div class="hkpi-val">67.3</div><div class="hkpi-delta">score out of 100</div></div>
+      <div class="hkpi"><div class="hkpi-lbl">HP flight risks</div><div class="hkpi-val">36</div><div class="hkpi-delta">performance 4+, risk 0.50+</div></div>
+      <div class="hkpi"><div class="hkpi-lbl">Replacement cost</div><div class="hkpi-val">$6.1M</div><div class="hkpi-delta">77 with risk 0.50+</div></div>
     </div>
   </div>
 </div>
 
 <div class="wrap">
+  <section class="dotsec" aria-label="Every employee as a dot">
+    <div>
+      <h2 class="dotsec-title">Every employee, one dot</h2>
+      <p class="dotsec-lead">Each dot is one synthetic employee. Switch the view to see who is at risk, who qualified for the retention pilot, and how the A/B test split them.</p>
+      <div class="view-switch" role="group" aria-label="Choose what the dots show">
+        <button type="button" data-view="risk" aria-pressed="true">Flight risk</button>
+        <button type="button" data-view="pilot" aria-pressed="false">Pilot eligibility</button>
+        <button type="button" data-view="ab" aria-pressed="false">Treatment vs control</button>
+      </div>
+      <div class="legend" id="dotLegend" aria-live="polite"></div>
+    </div>
+    <div class="dotwrap">
+      <canvas id="dotField" role="img" aria-label="1,000 dots, one per synthetic employee, colored by flight risk, pilot eligibility or A/B test group"></canvas>
+      <div class="dot-tip" id="dotTip"></div>
+    </div>
+  </section>
+
   <!-- ROW 1: Bubble + Dept -->
   <div class="g2">
     <div class="panel" style="animation-delay:.1s">
-      <div class="panel-tag">Talent Intelligence · Priority Matrix</div>
       <div class="panel-title">Talent Risk Priority Matrix</div>
       <div class="panel-sub">Bubble = replacement cost · Animated entry · Top-right = immediate action</div>
       <div class="cbox"><canvas id="bubbleChart"></canvas></div>
     </div>
     <div class="panel" style="animation-delay:.16s">
-      <div class="panel-tag">Workforce Risk · Departmental</div>
       <div class="panel-title">Avg Flight Risk by Department</div>
       <div class="panel-sub">Bar = avg risk % · Line = actual attrition · Staggered animation</div>
       <div class="cbox"><canvas id="deptChart"></canvas></div>
@@ -399,22 +282,19 @@ table.ft tr:last-child td{border-bottom:none;}
 
   <!-- HEATMAP -->
   <div class="panel" style="margin-bottom:16px;animation-delay:.22s">
-    <div class="panel-tag">Workforce Planning · Multi-Dimensional Risk</div>
     <div class="panel-title">Workforce Planning Heatmap</div>
-    <div class="panel-sub">Risk signal intensity by department — deeper blue = higher risk</div>
+    <div class="panel-sub">Risk signal intensity by department — pale yellow = lower, deep red = higher risk</div>
     <div style="overflow-x:auto;"><table class="ht" id="htbl"></table></div>
   </div>
 
   <!-- ROW 3: Flight Risk + Engagement -->
   <div class="g3">
     <div class="panel" style="animation-delay:.28s">
-      <div class="panel-tag">Retention Priority · Critical Registry</div>
       <div class="panel-title">High-Performer Flight Risk Registry</div>
-      <div class="panel-sub">Performance ≥ 4 · Flight risk ≥ 0.50 · Sorted by retention priority · 36 employees</div>
+      <div class="panel-sub">Performance ≥ 4 · Flight risk ≥ 0.50 · Sorted by retention priority · 36 employees, top 22 shown</div>
       <div class="ftw"><table class="ft" id="ftbl"></table></div>
     </div>
     <div class="panel" style="animation-delay:.34s">
-      <div class="panel-tag">Workforce Health · Engagement</div>
       <div class="panel-title">Engagement Distribution</div>
       <div class="panel-sub">Workforce across 5 engagement bands</div>
       <div class="cbox-sm"><canvas id="engChart"></canvas></div>
@@ -430,7 +310,7 @@ table.ft tr:last-child td{border-bottom:none;}
 
   <div class="kvr-header">
     <div class="kvr-title">Key <span>Visual</span> Results</div>
-    <div class="kvr-sub">Retention Intervention A/B Test · 533 eligible employees · synthetic_workforce.csv · R/03_ab_testing_retention_intervention.R</div>
+    <div class="kvr-sub">Retention Intervention A/B Test · 533 eligible employees · synthetic_workforce.csv · R/03_ab_testing_retention_intervention.R · simulated outcomes, not real-world business results</div>
   </div>
 
   <div class="kvr-grid">
@@ -438,15 +318,14 @@ table.ft tr:last-child td{border-bottom:none;}
     <!-- Card 1 -->
     <div class="kvr-card">
       <div class="kvr-card-top">
-        <div class="kvr-card-icon" style="--icon-bg:#edf4fa;">📋</div>
-        <div class="kvr-num">01 · Experiment Design</div>
+        <div class="kvr-num">Experiment Design</div>
         <div class="kvr-card-title">Experiment Design Summary</div>
         <div class="kvr-card-desc">Documents the full A/B test protocol — eligibility rules, sample sizes, treatment assignment logic, outcome metrics, and statistical parameters used for the retention intervention evaluation.</div>
       </div>
       <div class="kvr-card-footer">
         <a class="kvr-btn" href="08_ab_test_experiment_design.html" target="_blank">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Open Interactive Chart
+          Open interactive chart
         </a>
       </div>
     </div>
@@ -454,15 +333,14 @@ table.ft tr:last-child td{border-bottom:none;}
     <!-- Card 2 -->
     <div class="kvr-card">
       <div class="kvr-card-top">
-        <div class="kvr-card-icon" style="--icon-bg:#e6f7ee;">⚖️</div>
-        <div class="kvr-num">02 · Balance Check</div>
+        <div class="kvr-num">Balance Check</div>
         <div class="kvr-card-title">Pre-Intervention Balance Check</div>
         <div class="kvr-card-desc">Confirms that random assignment worked correctly — treatment and control groups were statistically comparable on 14 pre-intervention characteristics including age, tenure, performance, engagement, and flight risk.</div>
       </div>
       <div class="kvr-card-footer">
         <a class="kvr-btn" href="09_ab_test_balance_check.html" target="_blank">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Open Interactive Chart
+          Open interactive chart
         </a>
       </div>
     </div>
@@ -470,15 +348,14 @@ table.ft tr:last-child td{border-bottom:none;}
     <!-- Card 3 -->
     <div class="kvr-card">
       <div class="kvr-card-top">
-        <div class="kvr-card-icon" style="--icon-bg:#edf4fa;">📈</div>
-        <div class="kvr-num">03 · Engagement Lift</div>
+        <div class="kvr-num">Engagement Lift</div>
         <div class="kvr-card-title">Engagement Improvement by Group</div>
-        <div class="kvr-card-desc">The treatment group improved engagement by <strong>4.6 points more</strong> than control on average — a statistically significant and practically meaningful effect, with career-stalled and high-performing employees showing the strongest response.</div>
+        <div class="kvr-card-desc">The treatment group improved engagement by <strong>4.6 points more</strong> than control on average — a statistically significant difference (p &lt; 0.001) in this simulated experiment, with career-stalled and high-performing employees showing the strongest simulated response.</div>
       </div>
       <div class="kvr-card-footer">
         <a class="kvr-btn" href="10_ab_test_engagement_lift.html" target="_blank">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Open Interactive Chart
+          Open interactive chart
         </a>
       </div>
     </div>
@@ -486,15 +363,14 @@ table.ft tr:last-child td{border-bottom:none;}
     <!-- Card 4 -->
     <div class="kvr-card">
       <div class="kvr-card-top">
-        <div class="kvr-card-icon" style="--icon-bg:#fef6e4;">📉</div>
-        <div class="kvr-num">04 · Attrition Impact</div>
+        <div class="kvr-num">Attrition Impact</div>
         <div class="kvr-card-title">Post-Intervention Attrition Rate</div>
-        <div class="kvr-card-desc">Short-term attrition reduction in the treatment group was small and <strong>not statistically significant</strong> at 3 months — consistent with research showing engagement improvements precede attrition changes by 6–12 months.</div>
+        <div class="kvr-card-desc">The <strong>observed attrition rate difference was not statistically significant</strong> (0.3 pp, p = 0.916) — the simulation does not show an effect on attrition.</div>
       </div>
       <div class="kvr-card-footer">
         <a class="kvr-btn" href="11_ab_test_attrition_impact.html" target="_blank">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Open Interactive Chart
+          Open interactive chart
         </a>
       </div>
     </div>
@@ -502,15 +378,14 @@ table.ft tr:last-child td{border-bottom:none;}
     <!-- Card 5 -->
     <div class="kvr-card">
       <div class="kvr-card-top">
-        <div class="kvr-card-icon" style="--icon-bg:#fdecea;">📊</div>
-        <div class="kvr-num">05 · Treatment Effect Summary</div>
+        <div class="kvr-num">Treatment Effect Summary</div>
         <div class="kvr-card-title">Executive Effect Size Summary</div>
         <div class="kvr-card-desc">Full statistical results table with p-values, 95% confidence intervals, Cohen's d effect sizes, odds ratios from logistic regression, and business interpretation for each outcome — designed for executive review and HR decision-making.</div>
       </div>
       <div class="kvr-card-footer">
         <a class="kvr-btn" href="12_ab_test_treatment_effect_summary.html" target="_blank">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Open Interactive Chart
+          Open interactive chart
         </a>
       </div>
     </div>
@@ -518,20 +393,56 @@ table.ft tr:last-child td{border-bottom:none;}
     <!-- Card 6 -->
     <div class="kvr-card">
       <div class="kvr-card-top">
-        <div class="kvr-card-icon" style="--icon-bg:#f3eeff;">🎯</div>
-        <div class="kvr-num">06 · Segment Effects</div>
+        <div class="kvr-num">Segment Effects</div>
         <div class="kvr-card-title">Heterogeneous Treatment Effects by Segment</div>
-        <div class="kvr-card-desc"><strong>High-performing flight risks</strong> and <strong>career-stalled employees</strong> responded most strongly to the intervention — demonstrating that targeted deployment by segment yields better ROI than blanket application to the full at-risk population.</div>
+        <div class="kvr-card-desc"><strong>High-performing flight risks</strong> and <strong>career-stalled employees</strong> showed the largest simulated engagement response — a hypothesis that targeting by segment could work better than blanket application, to be tested in a real pilot (no ROI was measured).</div>
       </div>
       <div class="kvr-card-footer">
         <a class="kvr-btn" href="13_ab_test_segment_effects.html" target="_blank">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Open Interactive Chart
+          Open interactive chart
         </a>
       </div>
     </div>
 
   </div><!-- /kvr-grid -->
+
+  <!-- ══ STATS LAB ══════════════════════════════════════════════════════════ -->
+  <div class="section-divider">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-label">A/B Testing · Statistical Findings, Animated</div>
+    <div class="section-divider-line"></div>
+  </div>
+  <p class="lab-note">Four views of the same simulated experiment (533 synthetic employees, 266 treatment and 267 control). Every number comes from R/03_ab_testing_retention_intervention.R. These are simulated findings, not real-world business outcomes.</p>
+  <div class="lab-grid" id="labGrid">
+
+    <section class="lab-panel" id="labShift" aria-labelledby="t-shift">
+      <div class="lab-head"><div><h3 class="lab-title" id="t-shift">How far did engagement move?</h3><p class="lab-q">Each curve shows how much each employee's engagement score changed. Treatment shifted right.</p></div><button class="lab-replay" type="button">Replay</button></div>
+      <svg class="lab-svg" viewBox="0 0 560 290" role="img" aria-label="Engagement change distributions: treatment mean +5.06, control mean +0.42, difference +4.64 points"></svg>
+      <p class="lab-cap"><b>+4.64 points</b> higher in treatment than control (95% CI 4.10 to 5.19, p &lt; 0.001, Significant).</p>
+    </section>
+
+    <section class="lab-panel" id="labCI" aria-labelledby="t-ci">
+      <div class="lab-head"><div><h3 class="lab-title" id="t-ci">Does the interval cross zero?</h3><p class="lab-q">Each dot is an estimate and each line is its 95% confidence interval. The dashed line means no effect.</p></div><button class="lab-replay" type="button">Replay</button></div>
+      <svg class="lab-svg" viewBox="0 0 560 330" role="img" aria-label="Forest plot of four estimates with 95% confidence intervals"></svg>
+      <p class="lab-cap">Engagement and flight risk clear the dashed line. The attrition gap and the odds ratio do not, so <b>no attrition effect can be claimed</b>.</p>
+    </section>
+
+    <section class="lab-panel" id="labLeft" aria-labelledby="t-left">
+      <div class="lab-head"><div><h3 class="lab-title" id="t-left">Who left after the pilot?</h3><p class="lab-q">One dot per employee. Red dots left in the simulated follow-up.</p></div><button class="lab-replay" type="button">Replay</button></div>
+      <svg class="lab-svg" viewBox="0 0 560 290" role="img" aria-label="Attrition dot grids: 38 of 266 treatment employees left, 39 of 267 control employees left"></svg>
+      <p class="lab-cap"><b>14.3% vs 14.6%.</b> The 0.3 percentage point gap is not statistically significant (p = 0.916).</p>
+    </section>
+
+    <section class="lab-panel" id="labPerm" aria-labelledby="t-perm">
+      <div class="lab-head"><div><h3 class="lab-title" id="t-perm">Could chance explain it?</h3><p class="lab-q">Shuffle the group labels 5,000 times and see how big a gap luck alone produces.</p></div><button class="lab-replay" type="button">Replay</button></div>
+      <div class="lab-tabs" role="group" aria-label="Choose outcome"><button type="button" data-k="e" aria-pressed="true">Engagement</button><button type="button" data-k="a" aria-pressed="false">Attrition</button></div>
+      <svg class="lab-svg" viewBox="0 0 560 250" role="img" aria-label="Histogram of gaps from 5,000 label shuffles with the observed gap marked"></svg>
+      <p class="lab-cap" id="permCap"></p>
+    </section>
+
+  </div>
+
 
   <!-- ══ A/B TESTING KEY FINDINGS ═══════════════════════════════════════════ -->
   <div class="section-divider">
@@ -575,11 +486,11 @@ table.ft tr:last-child td{border-bottom:none;}
       </div>
       <div class="finding-item">
         <div class="finding-dot green"></div>
-        <div class="finding-text">The enhanced intervention <span class="finding-value">improved engagement by +4.6 points</span> more than control — a statistically significant effect (p &lt; 0.001) with a medium Cohen's d effect size.</div>
+        <div class="finding-text">The enhanced intervention <span class="finding-value">improved engagement by +4.6 points</span> more than control in the simulated data (95% CI 4.10–5.19, p &lt; 0.001, Significant), a large standardised difference (Cohen's d = 1.44).</div>
       </div>
       <div class="finding-item">
         <div class="finding-dot green"></div>
-        <div class="finding-text"><span class="finding-value">Flight risk decreased</span> in the treatment group post-intervention, with the reduction strongest among high-performing employees with high baseline risk scores.</div>
+        <div class="finding-text"><span class="finding-value">Flight-risk score decreased</span> more in the treatment group in the simulated data (difference −0.053, 95% CI −0.060 to −0.047, p &lt; 0.001), with the reduction strongest among high-performing employees with high baseline risk scores.</div>
       </div>
     </div>
 
@@ -590,19 +501,19 @@ table.ft tr:last-child td{border-bottom:none;}
 
       <div class="finding-item">
         <div class="finding-dot amber"></div>
-        <div class="finding-text"><span class="finding-value">Short-term attrition reduction was small and not statistically significant</span> — this is expected at 3 months, as engagement improvements typically precede attrition changes by 6–12 months.</div>
+        <div class="finding-text"><span class="finding-value">Observed attrition rate difference: 0.3 pp (14.3% treatment vs 14.6% control), not statistically significant</span> (p = 0.916; adjusted odds ratio 0.91, 95% CI 0.54–1.51 includes 1). No protective effect can be claimed.</div>
       </div>
       <div class="finding-item">
         <div class="finding-dot blue"></div>
-        <div class="finding-text"><span class="finding-value">High-performing flight risks and career-stalled employees</span> responded most strongly — suggesting the intervention should be prioritised for these two segments rather than applied uniformly.</div>
+        <div class="finding-text"><span class="finding-value">High-performing flight risks and career-stalled employees</span> responded most strongly in the simulation — a hypothesis to test in a real pilot, not a conclusion about real employees.</div>
       </div>
       <div class="finding-item">
         <div class="finding-dot green"></div>
-        <div class="finding-text">The engagement improvement is a <span class="finding-value">leading indicator</span> — HR leaders should monitor the treatment cohort for 6–12 months to capture the full attrition impact before scaling the programme.</div>
+        <div class="finding-text">In the simulation, <span class="finding-value">engagement and flight-risk scores moved but attrition did not</span> — whether engagement gains lead to lower attrition would need a longer, real-world pilot.</div>
       </div>
       <div class="finding-item">
         <div class="finding-dot amber"></div>
-        <div class="finding-text"><span class="finding-value">Next steps:</span> Scale to the full eligible population with segment-priority ordering, run a second randomised cohort to confirm external validity, and integrate findings into the causal inference module.</div>
+        <div class="finding-text"><span class="finding-value">Next steps (for a real pilot):</span> run a randomised pilot with real employees before any scale-up decision, test segment-priority ordering as a hypothesis, and integrate findings into the causal inference module.</div>
       </div>
     </div>
   </div>
@@ -610,7 +521,6 @@ table.ft tr:last-child td{border-bottom:none;}
   <!-- ══ FOOTER ════════════════════════════════════════════════════════════ -->
   <div class="footer">
     <span>HCDIS · Human Capital Decision Intelligence System · Farzana Khan Moutushi · All data synthetic — portfolio demonstration only</span>
-    <span>Refresh in <span id="cd">30</span>s · <span id="ts2">—</span></span>
   </div>
 </div>
 </div>
@@ -656,21 +566,261 @@ const ENG_BANDS=[41,180,343,288,148];
   requestAnimationFrame(draw);
 })();
 
-/* ── TIMESTAMPS ── */
-function ts(){const n=new Date();return n.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
-document.getElementById('hts').textContent=ts();setInterval(()=>{document.getElementById('hts').textContent=ts();document.getElementById('ts2').textContent=ts();},1000);
-let c=30;setInterval(()=>{c--;if(c<0)c=30;document.getElementById('cd').textContent=c;},1000);
+
+/* ── HERO DOT FIELD — one dot per employee (synthetic data) ── */
+(function(){
+  const DOTS=[[0.0,1],[0.0,0],[0.0,0],[0.0,0],[0.2,2],[0.1,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.3,2],[0.25,2],[0.35,2],[0.4,2],[0.4,2],[0.1,0],[0.3,1],[0.0,0],[0.0,0],[0.25,2],[0.3,1],[0.0,0],[0.3,2],[0.3,1],[0.0,1],[0.0,0],[0.3,1],[0.55,1],[0.0,2],[0.0,0],[0.1,0],[0.0,0],[0.0,0],[0.45,2],[0.1,0],[0.3,1],[0.4,1],[0.0,0],[0.2,1],[0.5,1],[0.0,2],[0.0,0],[0.2,0],[0.4,1],[0.0,0],[0.2,1],[0.0,0],[0.0,0],[0.2,0],[0.1,0],[0.2,1],[0.0,0],[0.35,1],[0.3,2],[0.1,0],[0.4,1],[0.2,0],[0.2,1],[0.4,1],[0.25,1],[0.45,2],[0.3,1],[0.25,2],[0.5,2],[0.55,2],[0.2,1],[0.1,0],[0.35,1],[0.3,1],[0.45,2],[0.0,0],[0.6,1],[0.55,2],[0.1,0],[0.35,1],[0.0,0],[0.0,0],[0.55,2],[0.2,2],[0.3,1],[0.0,0],[0.0,0],[0.3,2],[0.3,1],[0.4,2],[0.0,0],[0.25,1],[0.0,0],[0.0,0],[0.2,1],[0.3,2],[0.25,1],[0.2,0],[0.2,2],[0.2,0],[0.35,2],[0.0,0],[0.25,2],[0.1,0],[0.3,2],[0.0,2],[0.2,1],[0.4,2],[0.2,0],[0.4,1],[0.35,1],[0.25,0],[0.0,0],[0.0,0],[0.1,0],[0.25,1],[0.45,2],[0.0,0],[0.1,0],[0.3,2],[0.3,1],[0.3,2],[0.0,0],[0.0,2],[0.4,2],[0.5,2],[0.1,1],[0.3,2],[0.3,2],[0.2,1],[0.25,2],[0.0,0],[0.45,1],[0.4,2],[0.1,0],[0.3,1],[0.2,0],[0.35,1],[0.4,1],[0.2,1],[0.0,0],[0.1,0],[0.0,0],[0.3,2],[0.2,0],[0.0,0],[0.0,0],[0.0,0],[0.0,1],[0.35,1],[0.0,1],[0.0,0],[0.6,2],[0.1,0],[0.0,0],[0.0,2],[0.0,0],[0.2,2],[0.3,1],[0.2,1],[0.0,0],[0.3,2],[0.55,1],[0.3,2],[0.3,2],[0.0,0],[0.3,1],[0.3,1],[0.0,0],[0.2,2],[0.2,2],[0.0,0],[0.0,0],[0.2,2],[0.3,1],[0.0,0],[0.5,1],[0.0,2],[0.0,1],[0.4,1],[0.25,2],[0.3,1],[0.4,2],[0.0,2],[0.45,1],[0.0,0],[0.0,0],[0.1,0],[0.3,1],[0.2,0],[0.0,0],[0.0,0],[0.2,2],[0.0,0],[0.1,2],[0.35,2],[0.2,1],[0.0,0],[0.25,1],[0.2,0],[0.4,1],[0.0,0],[0.55,1],[0.1,0],[0.45,2],[0.15,0],[0.0,0],[0.25,1],[0.4,1],[0.0,0],[0.1,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.5,1],[0.2,0],[0.0,0],[0.1,0],[0.25,2],[0.0,0],[0.3,1],[0.2,2],[0.2,0],[0.2,1],[0.3,2],[0.0,0],[0.0,0],[0.25,2],[0.2,1],[0.4,2],[0.0,0],[0.4,2],[0.4,2],[0.3,1],[0.0,0],[0.0,0],[0.35,1],[0.0,0],[0.0,0],[0.3,1],[0.2,1],[0.0,1],[0.2,0],[0.3,1],[0.3,2],[0.0,0],[0.0,0],[0.0,0],[0.0,1],[0.4,1],[0.4,2],[0.5,1],[0.4,2],[0.25,1],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.25,0],[0.3,2],[0.3,2],[0.1,0],[0.0,0],[0.1,0],[0.3,1],[0.0,0],[0.3,2],[0.45,1],[0.2,2],[0.3,2],[0.2,2],[0.0,0],[0.0,0],[0.0,0],[0.45,1],[0.0,0],[0.0,0],[0.0,0],[0.25,1],[0.0,0],[0.25,2],[0.1,0],[0.3,2],[0.5,2],[0.6,1],[0.2,0],[0.2,0],[0.0,0],[0.55,2],[0.2,2],[0.35,1],[0.45,1],[0.1,0],[0.2,2],[0.2,1],[0.4,1],[0.25,0],[0.0,0],[0.4,2],[0.25,2],[0.5,2],[0.35,1],[0.5,1],[0.1,0],[0.15,0],[0.1,0],[0.0,0],[0.3,2],[0.1,0],[0.1,1],[0.2,0],[0.0,0],[0.3,1],[0.1,0],[0.25,2],[0.0,0],[0.1,0],[0.25,1],[0.5,2],[0.0,0],[0.0,0],[0.2,0],[0.2,1],[0.3,2],[0.0,0],[0.75,1],[0.0,0],[0.0,0],[0.4,2],[0.45,2],[0.3,2],[0.55,2],[0.4,2],[0.0,0],[0.1,0],[0.0,0],[0.0,0],[0.25,1],[0.0,0],[0.9,2],[0.35,2],[0.2,0],[0.2,1],[0.2,2],[0.4,2],[0.1,0],[0.0,0],[0.0,1],[0.2,0],[0.75,1],[0.3,2],[0.25,2],[0.25,0],[0.1,0],[0.35,2],[0.25,1],[0.0,0],[0.2,1],[0.3,2],[0.3,1],[0.0,0],[0.0,0],[0.0,0],[0.3,2],[0.25,2],[0.0,2],[0.0,0],[0.0,0],[0.3,2],[0.2,2],[0.1,0],[0.0,0],[0.25,2],[0.0,0],[0.1,0],[0.3,1],[0.25,1],[0.1,0],[0.3,1],[0.2,1],[0.3,1],[0.75,1],[0.1,2],[0.0,0],[0.3,1],[0.0,0],[0.0,0],[0.1,1],[0.45,2],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.25,1],[0.45,2],[0.4,1],[0.25,2],[0.2,2],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.1,0],[0.0,0],[0.1,0],[0.3,2],[0.25,1],[0.3,2],[0.0,0],[0.0,0],[0.35,1],[0.35,1],[0.2,2],[0.15,0],[0.3,1],[0.0,0],[0.3,1],[0.55,2],[0.1,0],[0.0,0],[0.1,0],[0.3,2],[0.25,2],[0.1,0],[0.0,0],[0.0,0],[0.3,1],[0.0,0],[0.45,2],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.2,2],[0.0,0],[0.0,0],[0.4,2],[0.0,1],[0.2,2],[0.0,1],[0.0,0],[0.2,2],[0.0,1],[0.3,2],[0.3,2],[0.15,0],[0.2,1],[0.55,2],[0.2,1],[0.3,2],[0.4,1],[0.0,0],[0.3,1],[0.1,0],[0.0,0],[0.2,1],[0.0,0],[0.5,1],[0.3,2],[0.0,0],[0.2,2],[0.0,0],[0.1,0],[0.3,2],[0.0,0],[0.2,0],[0.0,1],[0.0,0],[0.1,0],[0.45,2],[0.5,2],[0.2,1],[0.3,2],[0.0,0],[0.3,2],[0.1,0],[0.3,2],[0.35,1],[0.2,0],[0.3,1],[0.0,0],[0.2,2],[0.25,1],[0.0,2],[0.55,2],[0.45,1],[0.25,1],[0.2,2],[0.0,0],[0.0,0],[0.3,1],[0.35,1],[0.3,1],[0.0,0],[0.25,2],[0.75,1],[0.1,0],[0.0,0],[0.2,0],[0.5,2],[0.5,2],[0.55,2],[0.5,1],[0.3,2],[0.0,0],[0.3,2],[0.45,2],[0.0,0],[0.55,1],[0.3,1],[0.1,0],[0.1,0],[0.1,0],[0.4,1],[0.2,1],[0.65,2],[0.55,2],[0.5,1],[0.1,0],[0.0,0],[0.0,0],[0.2,0],[0.45,1],[0.25,2],[0.3,1],[0.3,1],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.55,2],[0.55,2],[0.0,0],[0.4,1],[0.25,1],[0.5,1],[0.35,2],[0.15,0],[0.1,0],[0.35,2],[0.0,0],[0.3,1],[0.5,2],[0.0,0],[0.3,1],[0.3,1],[0.35,2],[0.5,1],[0.3,2],[0.0,0],[0.3,1],[0.1,2],[0.2,1],[0.0,0],[0.1,1],[0.2,0],[0.3,2],[0.3,2],[0.25,2],[0.5,1],[0.7,1],[0.1,0],[0.0,0],[0.4,2],[0.1,0],[0.15,0],[0.0,2],[0.0,0],[0.5,1],[0.2,0],[0.2,0],[0.6,1],[0.25,1],[0.0,0],[0.1,0],[0.0,0],[0.0,0],[0.25,1],[0.2,0],[0.3,2],[0.1,0],[0.2,2],[0.2,2],[0.25,1],[0.1,0],[0.1,0],[0.0,2],[0.35,1],[0.3,1],[0.2,1],[0.3,1],[0.0,0],[0.0,0],[0.2,2],[0.25,2],[0.1,0],[0.6,1],[0.3,2],[0.1,0],[0.65,2],[0.0,0],[0.55,1],[0.3,1],[0.4,1],[0.0,0],[0.5,1],[0.1,0],[0.0,0],[0.3,1],[0.0,2],[0.2,2],[0.35,2],[0.1,0],[0.0,0],[0.3,2],[0.1,0],[0.45,2],[0.3,2],[0.1,0],[0.0,0],[0.0,0],[0.1,0],[0.0,1],[0.1,0],[0.0,0],[0.2,0],[0.15,0],[0.1,2],[0.5,1],[0.5,1],[0.3,2],[0.0,0],[0.1,0],[0.55,2],[0.35,2],[0.15,1],[0.0,0],[0.4,1],[0.15,1],[0.2,0],[0.55,1],[0.0,0],[0.3,1],[0.3,2],[0.25,2],[0.0,0],[0.3,2],[0.35,2],[0.35,2],[0.4,1],[0.0,0],[0.0,0],[0.1,0],[0.35,1],[0.0,0],[0.45,1],[0.3,1],[0.15,0],[0.3,1],[0.0,0],[0.2,2],[0.2,2],[0.45,2],[0.3,1],[0.1,0],[0.3,2],[0.0,0],[0.0,1],[0.3,2],[0.0,0],[0.3,2],[0.0,0],[0.3,2],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.3,1],[0.2,2],[0.0,0],[0.45,1],[0.0,0],[0.3,2],[0.75,2],[0.0,0],[0.0,1],[0.75,1],[0.45,2],[0.0,1],[0.0,1],[0.3,2],[0.0,0],[0.0,0],[0.0,2],[0.35,2],[0.3,2],[0.0,2],[0.15,0],[0.3,2],[0.0,0],[0.25,2],[0.0,1],[0.35,1],[0.1,0],[0.0,0],[0.1,0],[0.5,1],[0.1,0],[0.0,0],[0.0,0],[0.2,1],[0.3,1],[0.0,0],[0.45,1],[0.1,0],[0.2,2],[1.0,2],[0.3,2],[0.25,1],[0.45,2],[0.3,2],[0.6,1],[0.0,0],[0.6,1],[0.1,0],[0.4,2],[0.0,0],[0.3,1],[0.3,2],[0.0,2],[0.1,0],[0.0,0],[0.3,2],[0.0,0],[0.4,2],[0.1,0],[0.1,0],[0.2,0],[0.3,2],[0.0,0],[0.0,0],[0.0,0],[0.2,2],[0.25,2],[0.0,0],[0.6,2],[0.2,0],[0.3,2],[0.35,2],[0.1,0],[0.0,1],[0.2,2],[0.5,2],[0.1,0],[0.4,2],[0.2,1],[0.3,1],[0.2,0],[0.0,0],[0.1,0],[0.0,0],[0.2,0],[0.2,0],[0.0,0],[0.0,0],[0.0,0],[0.1,0],[0.0,0],[0.25,2],[0.4,2],[0.1,0],[0.3,2],[0.2,0],[0.3,2],[0.35,1],[0.15,0],[0.45,2],[0.0,0],[0.85,2],[0.0,0],[0.55,2],[0.25,2],[0.25,2],[0.3,1],[0.6,2],[0.45,1],[0.25,2],[0.3,2],[0.1,0],[0.0,1],[0.0,0],[0.25,1],[0.1,0],[0.0,0],[0.2,2],[0.1,0],[0.0,0],[0.35,2],[0.0,2],[0.25,1],[0.3,1],[0.2,0],[0.0,0],[0.0,0],[0.6,2],[0.0,0],[0.0,0],[0.1,0],[0.2,2],[0.0,0],[0.0,0],[0.4,2],[0.0,0],[0.45,2],[0.0,0],[0.1,0],[0.0,0],[0.4,1],[0.0,0],[0.25,2],[0.75,2],[0.0,0],[0.0,0],[0.0,0],[0.1,0],[0.0,0],[0.0,0],[0.0,0],[0.1,2],[0.0,0],[0.0,0],[0.4,1],[0.2,1],[0.0,0],[0.5,2],[0.0,0],[0.3,2],[0.0,0],[0.3,1],[0.0,0],[0.3,1],[0.4,1],[0.0,0],[0.0,0],[0.0,0],[0.3,1],[0.2,1],[0.2,1],[0.0,0],[0.45,2],[0.3,2],[0.0,0],[0.3,1],[0.2,1],[0.45,1],[0.0,0],[0.0,0],[0.0,0],[0.45,2],[0.0,0],[0.3,1],[0.0,0],[0.0,0],[0.25,2],[0.2,2],[0.3,1],[0.2,1],[0.4,1],[0.0,0],[0.2,1],[0.0,1],[0.2,0],[0.0,2],[0.25,1],[0.0,0],[0.1,0],[0.0,0],[0.2,1],[0.0,0],[0.0,0],[0.25,1],[0.1,0],[0.0,0],[0.15,0],[0.0,0],[0.45,1],[0.0,0],[0.1,0],[0.0,0],[0.2,1],[0.3,1],[0.0,0],[0.75,1],[0.0,0],[0.0,0],[0.1,0],[0.0,0],[0.0,0],[0.5,1],[0.5,1],[0.2,0],[0.0,0],[0.0,0],[0.0,0],[0.1,0],[0.3,1],[0.0,0],[0.0,0],[0.2,0],[0.1,0],[0.0,0],[0.25,2],[0.2,2],[0.2,0],[0.2,2],[0.2,0],[0.1,0],[0.0,0],[0.3,2],[0.4,1],[0.3,1],[0.1,0],[0.3,1],[0.0,0],[0.0,0],[0.0,0],[0.1,0],[0.0,0],[0.25,1],[0.2,0],[0.0,0],[0.25,1],[0.0,0],[0.35,2],[0.0,0],[0.0,0],[0.2,1],[0.1,0],[0.0,0],[0.25,1],[0.0,0],[0.15,0],[0.0,0],[0.0,0],[0.65,2],[0.4,1],[0.3,1],[0.1,0],[0.3,1],[0.1,1],[0.0,0],[0.3,2],[0.25,2],[0.0,0],[0.2,0],[0.1,0],[0.1,1],[0.3,2],[0.1,0],[0.2,1],[0.3,2],[0.2,1],[0.5,1],[0.2,2],[0.1,0],[0.2,1],[0.5,2],[0.55,1],[0.1,0],[0.3,1],[0.2,1],[0.0,0],[0.0,1],[0.0,0],[0.0,0],[0.0,0],[0.15,0],[0.2,0],[0.4,2],[0.25,2],[0.2,1],[0.1,0],[0.3,1],[0.2,1],[0.0,0],[0.0,0],[0.0,0],[0.0,0],[0.3,1],[0.0,2],[0.4,2],[0.0,0],[0.35,1],[0.3,1],[0.1,0],[0.0,0],[0.15,0]]; // [flight_risk_score, pilot_group] ; 0 = not eligible, 1 = control, 2 = treatment
+  const cvs=document.getElementById('dotField'),ctx=cvs.getContext('2d');
+  const tip=document.getElementById('dotTip'),legend=document.getElementById('dotLegend');
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+  const FAINT=hex('#c4d3e2'),TEAL=hex('#1a6db8');
+  const BINS=[
+    {max:0.10,c:'#c4d3e2',t:'Below 0.10'},
+    {max:0.30,c:'#f0cf74',t:'0.10 – 0.29'},
+    {max:0.50,c:'#e0990f',t:'0.30 – 0.49'},
+    {max:0.80,c:'#d2411e',t:'0.50 – 0.79'},
+    {max:9,c:'#8e1b1b',t:'0.80 and above'}
+  ];
+  const bin=r=>BINS.findIndex(b=>r<b.max-1e-9);
+  const N=DOTS.length;
+  const byRisk=[...Array(N).keys()].sort((a,b)=>DOTS[b][0]-DOTS[a][0]||a-b);
+  const orders={
+    risk:byRisk,
+    pilot:[...byRisk.filter(i=>DOTS[i][1]>0),...byRisk.filter(i=>DOTS[i][1]===0)],
+    ab:[...byRisk.filter(i=>DOTS[i][1]===2),...byRisk.filter(i=>DOTS[i][1]===1),...byRisk.filter(i=>DOTS[i][1]===0)]
+  };
+  const rank={};Object.keys(orders).forEach(k=>{rank[k]=new Array(N);orders[k].forEach((id,p)=>rank[k][id]=p);});
+  const count=(f)=>DOTS.filter(f).length;
+  const legends={
+    risk:()=>BINS.map((b,i)=>`<span><i style="background:${b.c}"></i>${b.t} (${count(d=>bin(d[0])===i)})</span>`).join(''),
+    pilot:()=>`<span><i style="background:#1a6db8"></i>Eligible for the pilot (${count(d=>d[1]>0)})</span><span><i style="background:#c4d3e2"></i>Not eligible (${count(d=>d[1]===0)})</span>`,
+    ab:()=>`<span><i style="background:#1a6db8"></i>Treatment (${count(d=>d[1]===2)})</span><span><i class="ring"></i>Control (${count(d=>d[1]===1)})</span><span><i style="background:#c4d3e2"></i>Not eligible (${count(d=>d[1]===0)})</span>`
+  };
+  const style=(i,view)=>{ // returns [r,g,b,fillAlpha,ringAlpha]
+    const [risk,g]=DOTS[i];
+    if(view==='risk'){const c=hex(BINS[bin(risk)].c);return[c[0],c[1],c[2],1,0];}
+    if(view==='pilot')return g>0?[...TEAL,1,0]:[...FAINT,1,0];
+    return g===2?[...TEAL,1,0]:g===1?[...TEAL,0,1]:[...FAINT,1,0];
+  };
+  let W=0,H=0,cols=1,cell=10,ox=0,oy=0,dpr=1,view='risk';
+  const st=Array.from({length:N},(_,i)=>({x:0,y:0,fx:0,fy:0,s:style(i,'risk'),fs:style(i,'risk')}));
+  function layout(){
+    dpr=window.devicePixelRatio||1;W=cvs.clientWidth;H=cvs.clientHeight;
+    cvs.width=W*dpr;cvs.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+    const c0=Math.sqrt(W*H/N);cols=Math.max(8,Math.floor(W/c0));
+    const rows=Math.ceil(N/cols);cell=Math.min(W/cols,H/rows);
+    ox=(W-cols*cell)/2;oy=(H-rows*cell)/2;
+  }
+  const pos=(k)=>[ox+(k%cols+.5)*cell,oy+(Math.floor(k/cols)+.5)*cell];
+  let t0=performance.now(),tweenStart=-1e9,TW=reduce?0:900,intro=reduce?1:0,introStart=t0;
+  function setTargets(v,instant){
+    st.forEach((d,i)=>{d.fx=d.x;d.fy=d.y;d.fs=d.s.slice();});
+    view=v;tweenStart=performance.now();if(instant)tweenStart=-1e9;
+  }
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  function frame(now){
+    const tt=TW?Math.min(1,(now-tweenStart)/TW):1,e=ease(Math.max(0,tt));
+    if(!reduce&&intro<1)intro=Math.min(1,(now-introStart)/1500);
+    ctx.clearRect(0,0,W,H);
+    const r=cell*.36;
+    for(let i=0;i<N;i++){
+      const d=st[i],[tx,ty]=pos(rank[view][i]),ts=style(i,view);
+      if(tt>=1){d.x=tx;d.y=ty;d.s=ts;}else{
+        d.x=d.fx+(tx-d.fx)*e;d.y=d.fy+(ty-d.fy)*e;
+        d.s=ts.map((v,k)=>d.fs[k]+(v-d.fs[k])*e);
+      }
+      const px=rank.risk[i]/N,a=intro>=1?1:Math.max(0,Math.min(1,(intro*1.7-px)/.7));
+      if(a<=0)continue;
+      ctx.globalAlpha=a;
+      const col=`rgb(${d.s[0]|0},${d.s[1]|0},${d.s[2]|0})`;
+      if(d.s[3]>0.01){ctx.globalAlpha=a*d.s[3];ctx.fillStyle=col;ctx.beginPath();ctx.arc(d.x,d.y,r,0,6.2832);ctx.fill();}
+      if(d.s[4]>0.01){ctx.globalAlpha=a*d.s[4];ctx.strokeStyle=col;ctx.lineWidth=Math.max(1.4,cell*.13);ctx.beginPath();ctx.arc(d.x,d.y,r*.86,0,6.2832);ctx.stroke();}
+    }
+    ctx.globalAlpha=1;
+    if(tt<1||intro<1)requestAnimationFrame(frame);else running=false;
+  }
+  let running=false;
+  function kick(){if(!running){running=true;requestAnimationFrame(frame);}}
+  function show(v,instant){
+    document.querySelectorAll('.view-switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===v));
+    legend.innerHTML=legends[v]();setTargets(v,instant);kick();
+  }
+  document.querySelectorAll('.view-switch button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+  cvs.addEventListener('mousemove',ev=>{
+    const rc=cvs.getBoundingClientRect(),mx=ev.clientX-rc.left,my=ev.clientY-rc.top;
+    const col=Math.floor((mx-ox)/cell),row=Math.floor((my-oy)/cell),k=row*cols+col;
+    if(col<0||col>=cols||row<0||k<0||k>=N){tip.style.opacity=0;return;}
+    const i=orders[view][k],[risk,g]=DOTS[i];
+    tip.textContent=`Flight risk ${risk.toFixed(2)} · ${g===2?'pilot treatment':g===1?'pilot control':'not in pilot'}`;
+    const p=pos(k);tip.style.left=p[0]+'px';tip.style.top=p[1]+'px';tip.style.opacity=1;
+  });
+  cvs.addEventListener('mouseleave',()=>{tip.style.opacity=0;});
+  new ResizeObserver(()=>{layout();kick();}).observe(cvs);
+  layout();show('risk',true);
+})();
+
+/* ── STATS LAB — animated statistical findings (values from R/03 output; synthetic data) ── */
+(function(){
+  const S={"kde":{"grid":[-8.0,-7.67,-7.33,-7.0,-6.67,-6.33,-6.0,-5.67,-5.33,-5.0,-4.67,-4.33,-4.0,-3.67,-3.33,-3.0,-2.67,-2.33,-2.0,-1.67,-1.33,-1.0,-0.67,-0.33,0.0,0.33,0.67,1.0,1.33,1.67,2.0,2.33,2.67,3.0,3.33,3.67,4.0,4.33,4.67,5.0,5.33,5.67,6.0,6.33,6.67,7.0,7.33,7.67,8.0,8.33,8.67,9.0,9.33,9.67,10.0,10.33,10.67,11.0,11.33,11.67,12.0,12.33,12.67,13.0,13.33,13.67,14.0,14.33,14.67,15.0,15.33,15.67,16.0,16.33,16.67,17.0,17.33,17.67,18.0,18.33,18.67,19.0,19.33,19.67,20.0,20.33,20.67,21.0,21.33,21.67,22.0,22.33,22.67,23.0,23.33,23.67,24.0],"t":[0.0003,0.0004,0.0006,0.0009,0.0012,0.0015,0.0017,0.002,0.0024,0.0029,0.0035,0.0044,0.0057,0.0074,0.0096,0.0122,0.0152,0.0185,0.022,0.0255,0.029,0.0323,0.0355,0.0387,0.042,0.0456,0.0497,0.0547,0.0605,0.0672,0.0746,0.0823,0.0899,0.0968,0.1025,0.1064,0.1086,0.109,0.1078,0.1056,0.1026,0.0991,0.0954,0.0916,0.0878,0.084,0.0801,0.0762,0.0722,0.068,0.0636,0.0591,0.0543,0.0494,0.0445,0.0397,0.0352,0.0311,0.0275,0.0242,0.0212,0.0184,0.0157,0.0131,0.0108,0.0088,0.0073,0.0062,0.0054,0.005,0.0047,0.0043,0.0039,0.0034,0.0028,0.0022,0.0016,0.0011,0.0007,0.0004,0.0002,0.0001,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"c":[0.0027,0.0036,0.0047,0.0062,0.008,0.0102,0.013,0.0163,0.0201,0.0244,0.0293,0.0348,0.0411,0.0483,0.0563,0.0651,0.0745,0.084,0.0933,0.1021,0.1103,0.1178,0.1245,0.1303,0.1349,0.1382,0.1396,0.1389,0.136,0.1311,0.1242,0.116,0.1067,0.0969,0.087,0.0771,0.0676,0.0584,0.0496,0.0414,0.0338,0.0269,0.0209,0.0157,0.0114,0.008,0.0053,0.0034,0.0021,0.0012,0.0006,0.0003,0.0002,0.0001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"means":{"t":5.06,"c":0.42},"perm_e":{"lo":-1.6,"hi":5.6,"h":[0,0,1,7,17,64,176,339,558,739,909,843,640,383,193,91,29,8,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"obs":4.64,"n_extreme":0},"perm_a":{"lo":-11,"hi":11,"h":[1,2,0,6,7,0,22,30,0,43,87,0,138,195,0,273,326,0,390,461,0,474,478,0,487,423,0,351,261,0,187,140,0,100,55,0,37,9,0,12,4,0,1,0],"obs":0.32,"share":0.509},"left":{"t":[38,266],"c":[39,267]}};
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NS='http://www.w3.org/2000/svg';
+  const BLUE='#1a6db8',AMBER='#e0990f',RED='#d2411e',SOFT='#c4d3e2',MID='#6898c0';
+  const el=(tag,attrs,parent,text)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;};
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+  function tween(ms,fn,done){
+    if(reduce){fn(1);if(done)done();return;}
+    let t0=null;(function step(n){if(t0===null)t0=n;const t=clamp((n-t0)/ms);fn(ease(t));if(t<1)requestAnimationFrame(step);else if(done)done();})(performance.now());
+  }
+  const later=(ms,f)=>reduce?f():setTimeout(f,ms);
+  const fmt=(v,d)=>(v<0?'−':'')+Math.abs(v).toFixed(d);
+
+  /* panel plumbing */
+  const panels={};
+  function reg(id,run){
+    const root=document.getElementById(id),svg=root.querySelector('svg');let gen=0;const sw=document.createElement('div');sw.className='lab-scroll';svg.parentNode.insertBefore(sw,svg);sw.appendChild(svg);
+    const go=()=>{gen++;const g=gen;svg.innerHTML='';run(svg,()=>g===gen,root);};
+    panels[id]=go;root.querySelector('.lab-replay').addEventListener('click',go);
+    if('IntersectionObserver' in window&&!reduce){
+      const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();go();}},{threshold:.2});io.observe(root);
+    }else go();
+  }
+
+  /* 1 ── engagement shift: two density curves, mean markers, bracket */
+  reg('labShift',(svg,alive)=>{
+    const G=S.kde.grid,W=560,L=24,R=24,base=236,top=70,H=base-top;
+    const x=v=>L+(v-G[0])/(G[G.length-1]-G[0])*(W-L-R);
+    const ymax=Math.max(...S.kde.t,...S.kde.c);
+    const y=d=>base-d/ymax*H;
+    const defs=el('defs',{},svg),cp=el('clipPath',{id:'shiftClip'},defs),cr=el('rect',{x:0,y:0,width:0,height:290},cp);
+    el('line',{x1:L,x2:W-R,y1:base,y2:base,class:'axis'},svg);
+    for(let v=-8;v<=24;v+=4){el('line',{x1:x(v),x2:x(v),y1:base,y2:base+4,class:'axis'},svg);el('text',{x:x(v),y:base+18,'text-anchor':'middle',class:'mut'},svg,(v>0?'+':v<0?'−':'')+Math.abs(v));}
+    el('text',{x:W/2,y:base+38,'text-anchor':'middle',class:'mut'},svg,'Change in engagement score (post minus pre, points)');
+    const area=(arr,fill,stroke)=>{
+      let d=`M${x(G[0])},${base}`;G.forEach((g,i)=>d+=`L${x(g)},${y(arr[i])}`);d+=`L${x(G[G.length-1])},${base}Z`;
+      el('path',{d,fill,stroke,'stroke-width':2,'clip-path':'url(#shiftClip)'},svg);
+    };
+    area(S.kde.c,'rgba(104,152,192,.35)',MID);area(S.kde.t,'rgba(26,109,184,.38)',BLUE);
+    const halo={style:'paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round'};
+    const mk=(m,color,label,anchor,dx)=>{
+      const ln=el('line',{x1:x(m),x2:x(m),y1:base,y2:base,stroke:color,'stroke-width':2},svg);
+      const tx=el('text',{x:x(m)+dx,y:top-6,'text-anchor':anchor,class:'strong',opacity:0,...halo},svg,label);
+      return {ln,tx,m};
+    };
+    const mc=mk(S.means.c,MID,'Control +'+S.means.c.toFixed(2),'end',-6),mt=mk(S.means.t,BLUE,'Treatment +'+S.means.t.toFixed(2),'start',6);
+    const br=el('g',{opacity:0},svg);
+    const by=top-30;
+    el('line',{x1:x(mc.m),x2:x(mt.m),y1:by,y2:by,stroke:'#08244a','stroke-width':1.6},br);
+    el('line',{x1:x(mc.m),x2:x(mc.m),y1:by-5,y2:by+5,stroke:'#08244a','stroke-width':1.6},br);
+    el('line',{x1:x(mt.m),x2:x(mt.m),y1:by-5,y2:by+5,stroke:'#08244a','stroke-width':1.6},br);
+    el('text',{x:(x(mc.m)+x(mt.m))/2,y:by-9,'text-anchor':'middle',class:'strong',style:'font-size:15px'},br,'+'+(S.means.t-S.means.c).toFixed(2)+' points');
+    tween(1500,e=>{if(alive())cr.setAttribute('width',560*e);},()=>{
+      if(!alive())return;
+      [mc,mt].forEach((m,i)=>later(i*250,()=>tween(500,e=>{if(!alive())return;m.ln.setAttribute('y2',base-(base-top+14)*e);m.tx.setAttribute('opacity',e);})));
+      later(800,()=>tween(500,e=>{if(alive())br.setAttribute('opacity',e);}));
+    });
+  });
+
+  /* 2 ── forest plot: estimate and 95% CI against the no-effect line */
+  reg('labCI',(svg,alive)=>{
+    const rows=[
+      {t:'Engagement change, Treatment − Control (points)',e:4.64,lo:4.10,hi:5.19,ax:[-1,6],tk:[0,2,4,6],nul:0,p:'p < 0.001 · Significant',sig:1,v:'+4.64  [4.10, 5.19]'},
+      {t:'Flight-risk score change, Treatment − Control',e:-0.0533,lo:-0.0601,hi:-0.0465,ax:[-0.08,0.02],tk:[-0.08,-0.04,0],nul:0,p:'p < 0.001 · Significant',sig:1,v:'−0.053  [−0.060, −0.047]'},
+      {t:'Attrition rate gap, Control − Treatment (percentage points)',e:0.32,lo:-5.65,hi:6.29,ax:[-8,8],tk:[-8,-4,0,4,8],nul:0,p:'p = 0.916 · Not significant',sig:0,v:'+0.3  [−5.65, 6.29]'},
+      {t:'Attrition odds ratio, Treatment vs Control (adjusted)',e:0.906,lo:0.543,hi:1.508,ax:[0.4,2.5],tk:[0.5,1,2],nul:1,p:'p = 0.704 · Not significant',sig:0,v:'0.91  [0.54, 1.51]',log:1}
+    ];
+    const L=24,R=536,rh=80;
+    rows.forEach((r,i)=>{
+      const y0=22+i*rh,ay=y0+34,col=r.sig?BLUE:AMBER;
+      const sc=r.log?(v=>L+(Math.log(v)-Math.log(r.ax[0]))/(Math.log(r.ax[1])-Math.log(r.ax[0]))*(R-L)):(v=>L+(v-r.ax[0])/(r.ax[1]-r.ax[0])*(R-L));
+      el('text',{x:L,y:y0,class:'strong'},svg,r.t);
+      el('text',{x:L,y:y0+16,style:'fill:'+(r.sig?'#12519a':'#8a5a00')+';font-weight:600'},svg,r.p);
+      el('text',{x:R,y:y0+16,'text-anchor':'end',class:'mut'},svg,r.v);
+      el('line',{x1:L,x2:R,y1:ay,y2:ay,class:'axis'},svg);
+      r.tk.forEach(v=>{el('line',{x1:sc(v),x2:sc(v),y1:ay,y2:ay+4,class:'axis'},svg);el('text',{x:sc(v),y:ay+17,'text-anchor':'middle',class:'mut'},svg,String(v).replace('-','−'));});
+      el('line',{x1:sc(r.nul),x2:sc(r.nul),y1:ay-16,y2:ay+6,class:'null'},svg);
+      const ci=el('line',{x1:sc(r.e),x2:sc(r.e),y1:ay,y2:ay,stroke:col,'stroke-width':3.5,'stroke-linecap':'round'},svg);
+      const dot=el('circle',{cx:sc(r.nul),cy:ay,r:6.5,fill:col,stroke:'#fff','stroke-width':2,opacity:0},svg);
+      later(i*300,()=>tween(1000,t=>{
+        if(!alive())return;
+        dot.setAttribute('opacity',Math.min(1,t*4));
+        dot.setAttribute('cx',sc(r.nul)+(sc(r.e)-sc(r.nul))*t);
+        const c=sc(r.nul)+(sc(r.e)-sc(r.nul))*t;
+        ci.setAttribute('x1',c+(sc(r.lo)-c)*t);ci.setAttribute('x2',c+(sc(r.hi)-c)*t);
+      }));
+    });
+  });
+
+  /* 3 ── who left: one dot per employee */
+  reg('labLeft',(svg,alive)=>{
+    function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+    const groups=[{name:'Treatment',left:S.left.t[0],n:S.left.t[1],x0:22,seed:11},{name:'Control',left:S.left.c[0],n:S.left.c[1],x0:296,seed:23}];
+    const cols=19,sp=13.2,y0=74;
+    groups.forEach(g=>{
+      const r=rng(g.seed),idx=[...Array(g.n).keys()];for(let i=idx.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}
+      g.leavers=new Set(idx.slice(0,g.left));g.order=idx.slice(0,g.left);
+      el('text',{x:g.x0,y:26,class:'strong',style:'font-size:14px'},svg,g.name+' · '+g.n+' employees');
+      g.count=el('text',{x:g.x0,y:46,style:'font-size:13px;font-weight:600;fill:'+RED},svg,'0 left');
+      g.dots=[];
+      for(let i=0;i<g.n;i++){
+        const c=el('circle',{cx:g.x0+(i%cols)*sp+5,cy:y0+Math.floor(i/cols)*sp,r:4.4,fill:SOFT,opacity:0},svg);g.dots.push(c);
+      }
+    });
+    tween(1000,e=>{if(!alive())return;groups.forEach(g=>g.dots.forEach((d,i)=>d.setAttribute('opacity',clamp(e*1.8-Math.floor(i/cols)/Math.ceil(g.n/cols)*.8))));},()=>{
+      if(!alive())return;
+      tween(1500,e=>{
+        if(!alive())return;
+        groups.forEach(g=>{const k=Math.floor(e*g.left+1e-6);g.count.textContent=k+' left'+(e>=1?' ('+(g.left/g.n*100).toFixed(1)+'%)':'');
+          g.order.forEach((di,j)=>{const on=j<k;const d=g.dots[di];d.setAttribute('fill',on?RED:SOFT);d.setAttribute('r',on?(j===k-1&&e<1?6.2:4.8):4.4);});});
+      });
+    });
+  });
+
+  /* 4 ── permutation test: shuffle labels, see what chance produces */
+  (function(){
+    let key='e';
+    const root=document.getElementById('labPerm');
+    root.querySelectorAll('.lab-tabs button').forEach(b=>b.addEventListener('click',()=>{key=b.dataset.k;root.querySelectorAll('.lab-tabs button').forEach(o=>o.setAttribute('aria-pressed',o===b));panels.labPerm();}));
+    reg('labPerm',(svg,alive,root)=>{
+      const P=key==='e'?S.perm_e:S.perm_a,H=P.h,nb=H.length,W=560,L=24,R=24,base=196,top=48,hh=base-top,mx=Math.max(...H);
+      const x=v=>L+(v-P.lo)/(P.hi-P.lo)*(W-L-R),bw=(W-L-R)/nb;
+      const cap=root.querySelector('#permCap');cap.innerHTML='&nbsp;';
+      el('line',{x1:L,x2:W-R,y1:base,y2:base,class:'axis'},svg);
+      const step=key==='e'?1:5,start=Math.ceil(P.lo/step)*step;
+      for(let v=start;v<=P.hi;v+=step){el('line',{x1:x(v),x2:x(v),y1:base,y2:base+4,class:'axis'},svg);el('text',{x:x(v),y:base+18,'text-anchor':'middle',class:'mut'},svg,(v>0?'+':v<0?'−':'')+Math.abs(v));}
+      el('text',{x:W/2,y:base+38,'text-anchor':'middle',class:'mut'},svg,key==='e'?'Gap in engagement change from shuffled labels (points)':'Gap in attrition, control minus treatment (percentage points)');
+      const bars=H.map((h,i)=>el('rect',{x:L+i*bw+.6,y:base,width:bw-1.2,height:0,fill:'#c4d3e2',rx:1},svg));
+      const cnt=el('text',{x:L,y:22,class:'strong',style:'font-size:14px'},svg,'Reshuffles: 0');
+      const ol=el('line',{x1:x(P.obs),x2:x(P.obs),y1:top-14,y2:top-14,stroke:RED,'stroke-width':2.5},svg);
+      const ot=el('text',{x:x(P.obs)+(key==='e'?-8:8),y:top-20,'text-anchor':key==='e'?'end':'start',style:'font-weight:700;fill:'+RED,opacity:0},svg,'Observed '+(P.obs>0?'+':'')+P.obs.toFixed(2)+(key==='e'?' points':' pp'));
+      tween(2200,e=>{
+        if(!alive())return;
+        cnt.textContent='Reshuffles: '+Math.round(e*5000).toLocaleString('en-US');
+        bars.forEach((b,i)=>{const h=H[i]/mx*hh*e;b.setAttribute('height',h);b.setAttribute('y',base-h);});
+      },()=>{
+        if(!alive())return;
+        tween(600,e=>{if(!alive())return;ol.setAttribute('y2',top-14+(base-top+14)*e);ot.setAttribute('opacity',e);},()=>{
+          if(!alive())return;
+          cap.innerHTML=key==='e'
+            ?`<b>${P.n_extreme} of 5,000</b> reshuffles produced a gap as large as +${P.obs.toFixed(2)} points. Chance alone almost never does this.`
+            :`In <b>${Math.round(P.share*100)}%</b> of reshuffles, treatment had fewer leavers by ${P.obs.toFixed(1)} pp or more. That is a coin flip, so the gap is well within what chance produces.`;
+        });
+      });
+    });
+  })();
+})();
 
 /* ── CHART.JS ── */
-Chart.defaults.color='#3a6090';Chart.defaults.borderColor='rgba(168,205,240,0.5)';
-Chart.defaults.font.family="'IBM Plex Mono',monospace";Chart.defaults.font.size=11;
+Chart.defaults.color='#3a6090';Chart.defaults.borderColor='rgba(8,36,74,0.10)';
+Chart.defaults.font.family="'Instrument Sans',sans-serif";Chart.defaults.font.size=12;
 
 const AC={
-  'Immediate retention intervention':{f:'rgba(200,48,42,0.80)',b:'#c8302a'},
-  'Monitor closely':{f:'rgba(201,124,0,0.80)',b:'#c97c00'},
-  'Career development plan':{f:'rgba(47,141,220,0.80)',b:'#2f8ddc'},
-  'Compensation review':{f:'rgba(8,145,178,0.76)',b:'#0891b2'},
-  'No immediate action':{f:'rgba(26,122,72,0.55)',b:'#1a7a48'},
+  'Immediate retention intervention':{f:'rgba(210,65,30,0.80)',b:'#d2411e'},
+  'Monitor closely':{f:'rgba(224,153,15,0.80)',b:'#e0990f'},
+  'Career development plan':{f:'rgba(26,109,184,0.80)',b:'#1a6db8'},
+  'Compensation review':{f:'rgba(107,90,166,0.76)',b:'#6b5aa6'},
+  'No immediate action':{f:'rgba(47,125,79,0.55)',b:'#2f7d4f'},
 };
 
 /* ── BUBBLE — animated rise ── */
@@ -703,8 +853,8 @@ const AC={
           callbacks:{label(ctx){const e=ctx.raw.raw;return[`${e.id} · ${e.dept}`,`Risk: ${(e.risk*100).toFixed(0)}%  Perf: ${e.perf}/5  Eng: ${e.eng}`,`Compa: ${e.compa}  TSP: ${e.tsp}mo`,`Repl. cost: $${(e.rc/1000).toFixed(0)}k`,`→ ${e.action}`];}}}
       },
       scales:{
-        x:{title:{display:true,text:'Flight risk score',color:'#3a6090',font:{size:10}},min:0,max:1.05,grid:{color:'rgba(168,205,240,0.4)'},ticks:{color:'#3a6090',callback:v=>(v*100).toFixed(0)+'%'}},
-        y:{title:{display:true,text:'Performance rating',color:'#3a6090',font:{size:10}},min:1,max:5.7,grid:{color:'rgba(168,205,240,0.4)'},ticks:{color:'#3a6090',stepSize:1}}
+        x:{title:{display:true,text:'Flight risk score',color:'#3a6090',font:{size:10}},min:0,max:1.05,grid:{color:'rgba(8,36,74,0.10)'},ticks:{color:'#3a6090',callback:v=>(v*100).toFixed(0)+'%'}},
+        y:{title:{display:true,text:'Performance rating',color:'#3a6090',font:{size:10}},min:1,max:5.7,grid:{color:'rgba(8,36,74,0.10)'},ticks:{color:'#3a6090',stepSize:1}}
       }
     }
   });
@@ -729,11 +879,11 @@ const AC={
       labels:ds.map(d=>d.dept),
       datasets:[
         {label:'Avg flight risk %',data:ds.map(d=>+(d.avgRisk*100).toFixed(1)),
-         backgroundColor:ds.map(d=>d.avgRisk>0.21?'rgba(200,48,42,0.77)':d.avgRisk>0.185?'rgba(201,124,0,0.77)':'rgba(47,141,220,0.77)'),
+         backgroundColor:ds.map(d=>d.avgRisk>0.21?'rgba(210,65,30,0.77)':d.avgRisk>0.185?'rgba(224,153,15,0.77)':'rgba(26,109,184,0.77)'),
          borderColor:'transparent',borderRadius:6,borderSkipped:false,yAxisID:'y'},
         {label:'Attrition rate %',data:ds.map(d=>d.attrR),type:'line',
-         borderColor:'#0891b2',backgroundColor:'transparent',borderWidth:2.5,
-         pointBackgroundColor:'#0891b2',pointRadius:5,pointHoverRadius:7,tension:.35,yAxisID:'y'},
+         borderColor:'#6b5aa6',backgroundColor:'transparent',borderWidth:2.5,
+         pointBackgroundColor:'#6b5aa6',pointRadius:5,pointHoverRadius:7,tension:.35,yAxisID:'y'},
       ]
     },
     options:{
@@ -745,8 +895,8 @@ const AC={
           callbacks:{label(ctx){const d=ds[ctx.dataIndex];return ctx.dataset.label+': '+ctx.raw+'%  (n='+d.n+')';}}}
       },
       scales:{
-        x:{grid:{color:'rgba(168,205,240,0.3)'},ticks:{color:'#3a6090',maxRotation:35,font:{size:10}}},
-        y:{grid:{color:'rgba(168,205,240,0.3)'},ticks:{color:'#3a6090',callback:v=>v+'%'},min:0,max:28}
+        x:{grid:{color:'rgba(8,36,74,0.08)'},ticks:{color:'#3a6090',maxRotation:35,font:{size:10}}},
+        y:{grid:{color:'rgba(8,36,74,0.08)'},ticks:{color:'#3a6090',callback:v=>v+'%'},min:0,max:28}
       }
     }
   });
@@ -761,8 +911,8 @@ const AC={
   cols.forEach(c=>{const t=document.createElement('th');t.textContent=c;hrow.appendChild(t);});
   const rows=DEPT.map(d=>[d.attrR,+(d.avgRisk*100).toFixed(1),d.lowEng,d.belMkt,d.hpfr]);
   const ranges=cols.map((_,ci)=>{const vs=rows.map(r=>r[ci]);return{lo:Math.min(...vs),hi:Math.max(...vs)};});
-  function hfill(v,lo,hi){const t=(v-lo)/(hi-lo+.001);const r=Math.round(210-t*162),g=Math.round(230-t*142),b=Math.round(252-t*72);return`rgb(${r},${g},${b})`;}
-  function htxt(v,lo,hi){return(v-lo)/(hi-lo+.001)>.55?'#082c5a':'#1a3f6e';}
+  function hfill(v,lo,hi){const t=Math.min(1,Math.max(0,(v-lo)/(hi-lo+.001)));const S=[[255,247,222],[250,196,100],[226,106,52],[176,38,36]];const p=t*(S.length-1),i=Math.min(S.length-2,Math.floor(p)),f=p-i;const c=S[i].map((a,k)=>Math.round(a+(S[i+1][k]-a)*f));return`rgb(${c[0]},${c[1]},${c[2]})`;}
+  function htxt(v,lo,hi){return(v-lo)/(hi-lo+.001)>.62?'#ffffff':'#2b1a0b';}
   const tb=tbl.createTBody();
   DEPT.forEach((d,ri)=>{
     const tr=tb.insertRow();const td0=tr.insertCell();td0.textContent=d.dept;
@@ -785,7 +935,7 @@ const AC={
   HPFR.forEach(e=>{
     const tr=fb.insertRow();
     const pct=Math.round(e.risk*100);
-    const bc=pct>=70?'#c8302a':pct>=55?'#c97c00':'#2f8ddc';
+    const bc=pct>=70?'#d2411e':pct>=55?'#e0990f':'#1a6db8';
     const ac=e.action==='Immediate retention intervention'?'bc':e.action==='Monitor closely'?'bh':'bm';
     [`<span class="mono">${e.id}</span>`,e.dept,e.jf,`<span class="mono">${e.eng}</span>`,
      `<div class="bw"><div class="bb"><div class="bf" data-w="${pct}" style="width:0%;background:${bc}"></div></div><span class="mono">${pct}%</span></div>`,
@@ -803,8 +953,8 @@ const AC={
     data:{
       labels:['Critical (<40)','Low (40–55)','Moderate (55–70)','High (70–85)','Thriving (>85)'],
       datasets:[{data:ENG_BANDS,
-        backgroundColor:['#c8302acc','#c97c00cc','#2f8ddccc','#1a7a48cc','#0891b2cc'],
-        borderColor:['#c8302a','#c97c00','#2f8ddc','#1a7a48','#0891b2'],
+        backgroundColor:['#d2411ecc','#e0990fcc','#1a6db8cc','#2f7d4fcc','#6b5aa6cc'],
+        borderColor:['#d2411e','#e0990f','#1a6db8','#2f7d4f','#6b5aa6'],
         borderWidth:1.5,hoverOffset:8}]
     },
     options:{
