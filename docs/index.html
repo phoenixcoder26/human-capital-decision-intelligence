@@ -175,6 +175,32 @@ table.ft tr:hover td{background:var(--wash)}
 .lab-tabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 @media (max-width:980px){.lab-grid{grid-template-columns:1fr}}
 @media (max-width:640px){.lab-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}.lab-svg{min-width:520px}.lab-cap{min-height:0}}
+/* VERDICT — closing section */
+.vd-wide{grid-column:1/-1}
+.vd-tabs{display:flex;gap:6px;margin:2px 0 8px}
+.vd-tabs button{font:inherit;font-size:12.5px;font-weight:500;color:var(--ink2);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.vd-tabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.vd-power{display:grid;grid-template-columns:1.35fr 1fr;gap:28px;align-items:start}
+.vd-power>*{min-width:0}
+.vd-ctl label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin:0 0 4px}
+.vd-ctl output{font-variant-numeric:tabular-nums;color:var(--teal-d)}
+.vd-ctl input[type=range]{width:100%;accent-color:var(--teal);margin-bottom:16px}
+.vd-read{border-top:1px solid var(--ink);padding-top:10px}
+.vd-read div{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;color:var(--ink2);padding:5px 0;border-bottom:1px solid var(--line2)}
+.vd-read b{font-family:var(--serif);font-weight:400;font-size:24px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.vd-foot{font-size:12.5px;color:var(--ink3);margin-top:10px;line-height:1.5}
+.verdicts{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px}
+.verdict{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px 22px;position:relative;overflow:hidden}
+.verdict h3{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.1;color:var(--ink);max-width:14ch;min-height:52px}
+.stamp{position:absolute;top:16px;right:16px;font-weight:700;font-size:13px;letter-spacing:.02em;border:2.5px solid currentColor;border-radius:6px;padding:4px 10px;transform:rotate(6deg);opacity:1}
+.stamp.yes{color:var(--teal-d)}.stamp.no{color:#8a5a00}
+.js-stamps .stamp{opacity:0;transform:rotate(-8deg) scale(1.9)}
+.js-stamps .verdict.in .stamp{opacity:1;transform:rotate(6deg) scale(1);transition:opacity .25s ease,transform .45s cubic-bezier(.2,1.4,.4,1)}
+.verdict .ev{font-size:14px;font-weight:600;color:var(--ink);margin:16px 0 10px;line-height:1.4}
+.verdict .say,.verdict .not{font-size:13.5px;color:var(--ink2);line-height:1.5;margin-top:8px}
+.verdict .say b,.verdict .not b{display:block;font-size:12.5px;color:var(--ink3);font-weight:600}
+@media (max-width:980px){.vd-power{grid-template-columns:1fr}.verdicts{grid-template-columns:1fr}.verdict .ev{margin-top:14px}}
+@media (prefers-reduced-motion:reduce){.js-stamps .stamp{opacity:1!important;transform:rotate(6deg)!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -518,6 +544,57 @@ table.ft tr:hover td{background:var(--wash)}
     </div>
   </div>
 
+  <!-- ══ VERDICT ══════════════════════════════════════════════════════════════ -->
+  <div class="section-divider">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-label">A/B Testing · What the Evidence Supports</div>
+    <div class="section-divider-line"></div>
+  </div>
+  <p class="lab-note">Three closing views: who moved, why attrition may have been missed, and a plain-language ruling on each question. All simulated.</p>
+  <div class="lab-grid" id="vdGrid">
+
+    <section class="lab-panel vd-wide" id="vdMove" aria-labelledby="t-move">
+      <div class="lab-head"><div><h3 class="lab-title" id="t-move">Who moved?</h3><p class="lab-q">Every dot is one employee, grouped by flight-risk band. Watch where treatment and control employees land after the pilot.</p></div><button class="lab-replay" type="button">Replay</button></div>
+      <div class="vd-tabs" role="group" aria-label="Show before or after the pilot"><button type="button" data-s="pre" aria-pressed="true">Before the pilot</button><button type="button" data-s="post" aria-pressed="false">After the pilot</button></div>
+      <svg class="lab-svg" viewBox="0 0 1000 300" role="img" aria-label="Employees grouped by flight-risk band before and after the pilot, treatment and control side by side"></svg>
+      <p class="lab-cap" id="moveCap"></p>
+    </section>
+
+    <section class="lab-panel vd-wide" id="vdPower" aria-labelledby="t-power">
+      <div class="lab-head"><div><h3 class="lab-title" id="t-power">Why might attrition have been missed?</h3><p class="lab-q">"Not significant" does not mean "no effect". It can mean the test was too small to tell. Move the sliders to see how likely a test like this is to catch a real drop in attrition.</p></div></div>
+      <div class="vd-power">
+        <div><svg class="lab-svg" viewBox="0 0 560 270" role="img" aria-label="Power curve: chance of detecting a true reduction in attrition by effect size"></svg></div>
+        <div class="vd-ctl">
+          <label for="vdEff">True reduction in attrition: <output id="vdEffO">4.0 pp</output></label>
+          <input id="vdEff" type="range" min="0" max="12" step="0.1" value="4">
+          <label for="vdN">People per group: <output id="vdNO">266</output></label>
+          <input id="vdN" type="range" min="100" max="2000" step="2" value="266">
+          <div class="vd-read">
+            <div><span>Chance the test detects this drop</span><b id="rdPower">–</b></div>
+            <div><span>Smallest drop caught 80% of the time</span><b id="rdMde">–</b></div>
+            <div><span>People per group for 80% at this drop</span><b id="rdNeed">–</b></div>
+          </div>
+          <p class="vd-foot" id="vdFoot"></p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+  <div class="verdicts" id="verdicts">
+    <article class="verdict"><span class="stamp yes">Supported</span><h3>Did engagement rise?</h3>
+      <p class="ev">+4.64 points, 95% CI 4.10 to 5.19, p &lt; 0.001. Cohen's d 1.44 (large).</p>
+      <p class="say"><b>You can say</b>In this simulation, the pilot group's engagement rose about 4.6 points more than the comparison group's.</p>
+      <p class="not"><b>You cannot say</b>That a real program would do this. The outcomes were simulated.</p></article>
+    <article class="verdict"><span class="stamp yes">Supported</span><h3>Did flight risk fall?</h3>
+      <p class="ev">−0.053 on the risk score, 95% CI −0.060 to −0.047, p &lt; 0.001. Cohen's d −1.34 (large).</p>
+      <p class="say"><b>You can say</b>Simulated flight-risk scores fell more in the pilot group, mostly among employees who started high.</p>
+      <p class="not"><b>You cannot say</b>That fewer people will leave. A risk score is a prediction, not a resignation.</p></article>
+    <article class="verdict"><span class="stamp no">Not supported</span><h3>Did attrition fall?</h3>
+      <p class="ev">0.3 pp gap (14.3% vs 14.6%), 95% CI −5.65 to 6.29, p = 0.916. Odds ratio 0.91, CI 0.54 to 1.51.</p>
+      <p class="say"><b>You can say</b>This sample shows no clear difference in who left.</p>
+      <p class="not"><b>You cannot say</b>That the pilot protects against attrition, or that it has no effect. With this many people, a modest real drop could easily be missed.</p></article>
+  </div>
+
   <!-- ══ FOOTER ════════════════════════════════════════════════════════════ -->
   <div class="footer">
     <span>HCDIS · Human Capital Decision Intelligence System · Farzana Khan Moutushi · All data synthetic — portfolio demonstration only</span>
@@ -808,6 +885,137 @@ const ENG_BANDS=[41,180,343,288,148];
         });
       });
     });
+  })();
+})();
+
+/* ── VERDICT SECTION — who moved, power explainer, stamped rulings (simulated data) ── */
+(function(){
+  const BANDS=[[0,0,1],[1,1,2],[1,1,2],[1,1,2],[2,1,2],[2,2,2],[2,1,2],[1,2,1],[1,1,2],[1,2,1],[1,1,2],[1,2,1],[0,0,1],[1,2,1],[3,3,1],[0,0,2],[2,2,2],[1,1,1],[2,2,1],[1,1,1],[2,3,1],[0,0,2],[2,2,1],[1,1,1],[1,1,1],[2,2,1],[1,1,2],[2,2,1],[1,1,1],[2,2,1],[1,1,1],[2,2,2],[1,1,1],[1,1,2],[2,2,2],[3,2,2],[1,1,1],[2,2,1],[1,2,1],[2,2,2],[3,3,1],[3,2,2],[2,2,1],[3,2,2],[1,1,2],[1,1,1],[1,1,2],[1,1,1],[2,2,2],[1,1,1],[1,1,1],[1,1,2],[1,1,1],[1,0,2],[2,2,2],[1,1,2],[1,1,2],[0,0,2],[1,1,1],[2,1,2],[2,2,1],[2,2,1],[1,1,1],[2,2,2],[1,1,2],[1,2,1],[1,1,2],[0,0,2],[2,2,2],[2,2,2],[0,0,1],[1,1,2],[1,1,2],[1,1,1],[1,2,2],[2,2,1],[2,2,2],[1,2,1],[2,2,1],[2,2,1],[1,1,1],[1,1,2],[0,0,1],[2,2,1],[0,0,1],[3,2,2],[0,0,2],[1,1,2],[1,2,1],[1,1,1],[1,2,2],[3,3,1],[1,1,2],[1,2,2],[1,1,1],[1,1,1],[1,1,2],[1,1,2],[1,1,2],[1,1,1],[2,2,1],[0,0,2],[0,0,1],[2,2,1],[1,1,2],[1,1,1],[2,2,2],[0,0,2],[2,2,1],[1,1,1],[1,1,2],[0,0,2],[2,1,2],[1,1,1],[1,1,1],[2,2,1],[3,3,1],[2,2,2],[1,1,1],[2,2,1],[2,3,1],[1,1,2],[1,1,1],[1,1,2],[1,1,1],[1,1,2],[1,1,2],[1,1,1],[2,2,2],[2,2,2],[2,1,2],[1,1,1],[2,2,1],[1,2,1],[1,1,1],[0,0,1],[1,2,1],[1,1,2],[0,0,1],[2,2,1],[2,2,2],[2,3,1],[2,2,2],[1,1,1],[1,1,2],[1,1,2],[1,2,1],[1,1,2],[2,2,1],[1,1,2],[1,1,2],[1,1,2],[2,2,1],[1,1,1],[1,1,2],[1,1,2],[2,2,2],[3,3,1],[3,2,2],[1,1,2],[2,2,1],[2,2,1],[1,1,2],[1,1,1],[2,2,1],[2,2,2],[1,1,2],[2,2,2],[2,2,1],[2,2,1],[1,1,2],[0,1,1],[1,1,1],[1,1,2],[1,1,1],[2,2,2],[1,1,1],[1,1,2],[3,3,1],[2,2,2],[2,2,2],[1,1,2],[3,2,2],[2,2,2],[1,1,1],[4,3,2],[2,2,2],[1,1,1],[1,1,2],[2,2,2],[0,0,1],[3,3,1],[1,1,2],[1,1,2],[2,1,2],[1,1,1],[1,1,1],[1,1,2],[1,1,1],[1,1,2],[1,2,2],[0,0,2],[1,1,2],[1,1,2],[1,1,2],[1,2,1],[1,1,1],[1,2,1],[1,1,1],[1,1,1],[3,3,1],[0,0,2],[1,2,1],[0,1,1],[2,2,2],[1,1,1],[2,2,2],[2,2,1],[1,1,2],[1,1,2],[1,1,2],[1,1,1],[1,2,2],[2,2,1],[2,2,1],[1,1,2],[1,2,1],[1,2,1],[3,2,2],[1,1,2],[1,1,2],[1,1,1],[2,2,2],[1,1,2],[2,2,2],[0,0,1],[1,1,2],[0,0,1],[1,1,2],[0,0,1],[1,1,2],[1,1,2],[1,1,1],[3,2,2],[1,1,1],[1,1,2],[2,2,1],[1,1,1],[1,1,1],[2,3,1],[1,1,2],[1,1,2],[1,2,2],[0,0,1],[2,2,2],[2,2,2],[1,1,1],[1,1,2],[1,1,2],[1,1,2],[2,2,1],[1,1,1],[1,1,2],[1,1,1],[0,0,2],[3,2,2],[2,2,1],[1,1,1],[1,1,2],[1,2,1],[2,2,1],[1,1,1],[1,1,2],[3,3,1],[2,2,2],[2,2,2],[3,2,2],[2,2,1],[1,1,2],[1,1,2],[2,2,2],[3,3,1],[1,1,1],[2,2,1],[1,1,1],[3,3,2],[3,2,2],[2,2,1],[2,2,1],[1,1,2],[1,2,1],[1,1,1],[3,2,2],[3,2,2],[2,2,1],[1,1,1],[2,3,1],[2,2,2],[2,2,2],[1,1,1],[2,2,2],[1,2,1],[1,1,1],[2,2,2],[2,3,1],[1,1,2],[1,2,1],[0,1,2],[1,1,1],[0,1,1],[1,1,2],[1,1,2],[1,1,2],[2,3,1],[3,3,1],[2,2,2],[0,0,2],[2,3,1],[3,3,1],[1,1,1],[1,1,1],[1,1,2],[1,1,2],[1,1,2],[1,1,1],[0,0,2],[2,2,1],[1,1,1],[1,1,1],[1,1,1],[1,1,2],[1,1,2],[3,3,1],[1,1,2],[3,3,2],[3,3,1],[1,1,1],[2,2,1],[2,2,1],[1,2,1],[0,0,2],[1,1,2],[2,1,2],[1,1,2],[2,2,2],[1,1,2],[0,0,1],[0,1,2],[2,3,1],[2,2,1],[1,2,2],[3,2,2],[2,1,2],[1,1,1],[2,2,1],[1,1,1],[3,3,1],[1,2,1],[1,1,2],[1,1,2],[1,1,2],[2,2,2],[2,1,2],[2,2,1],[2,2,1],[2,2,1],[1,1,1],[1,1,1],[1,1,2],[1,1,2],[2,2,2],[1,2,1],[1,1,2],[0,0,1],[1,1,2],[1,1,2],[1,1,2],[1,2,1],[1,0,2],[2,2,1],[1,1,2],[3,3,2],[0,0,1],[3,3,1],[2,2,2],[0,0,1],[0,0,1],[1,1,2],[0,0,2],[2,2,2],[1,1,2],[0,0,2],[1,1,2],[1,1,2],[0,0,1],[2,2,1],[2,3,1],[1,1,1],[1,2,1],[2,2,1],[1,1,2],[4,3,2],[1,1,2],[1,1,1],[2,1,2],[1,1,2],[3,3,1],[3,3,1],[2,2,2],[1,2,1],[1,1,2],[0,0,2],[1,1,2],[2,2,2],[1,1,2],[1,1,2],[1,1,2],[3,2,2],[1,1,2],[2,1,2],[0,0,1],[1,1,2],[2,2,2],[2,1,2],[1,1,1],[1,1,1],[1,1,2],[2,2,2],[1,1,2],[1,1,2],[2,2,1],[2,2,2],[4,3,2],[3,2,2],[1,1,2],[1,1,2],[1,1,1],[3,2,2],[2,2,1],[1,1,2],[1,1,2],[0,0,1],[1,1,1],[1,1,2],[2,2,2],[0,0,2],[1,1,1],[1,1,1],[3,2,2],[1,1,2],[2,2,2],[2,2,2],[2,2,1],[1,1,2],[3,3,2],[0,0,2],[2,2,1],[1,1,1],[2,2,2],[1,1,2],[1,1,1],[1,1,1],[2,2,1],[1,1,1],[1,1,1],[1,1,1],[2,2,2],[1,1,2],[1,1,1],[1,1,1],[2,2,1],[2,2,2],[1,2,1],[1,1,2],[1,1,2],[1,2,1],[1,1,1],[2,2,1],[1,1,1],[0,0,1],[0,0,2],[1,1,1],[1,1,1],[1,1,1],[2,2,1],[1,1,1],[1,1,1],[3,3,1],[2,3,1],[2,2,1],[1,1,1],[1,1,2],[1,1,2],[1,1,2],[1,1,2],[2,2,1],[1,2,1],[1,1,1],[1,1,1],[1,1,1],[2,1,2],[1,1,1],[1,1,1],[3,3,2],[2,2,1],[1,2,1],[1,1,1],[0,1,1],[1,1,2],[1,1,2],[0,1,1],[1,1,2],[1,1,1],[1,1,2],[1,1,1],[2,2,1],[1,1,2],[1,1,1],[2,2,2],[3,3,1],[1,2,1],[1,1,1],[0,0,1],[2,2,2],[1,1,2],[1,1,1],[1,2,1],[1,1,1],[1,2,1],[0,0,2],[2,1,2],[2,2,1],[1,1,1]]; // [preBand, postBand, group]  group: 1 control, 2 treatment
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NS='http://www.w3.org/2000/svg';
+  const el=(tag,attrs,parent,text)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;};
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+  const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+  function tween(ms,fn,done){if(reduce){fn(1);if(done)done();return;}let t0=null;(function step(n){if(t0===null)t0=n;const t=clamp((n-t0)/ms);fn(ease(t));if(t<1)requestAnimationFrame(step);else if(done)done();})(performance.now());}
+  function onVisible(node,cb,th){if('IntersectionObserver' in window&&!reduce){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();cb();}},{threshold:th||.25});io.observe(node);}else cb();}
+
+  /* 1 ── who moved */
+  (function(){
+    const root=document.getElementById('vdMove'),svg=root.querySelector('svg'),cap=document.getElementById('moveCap');
+    const sw=document.createElement('div');sw.className='lab-scroll';svg.parentNode.insertBefore(sw,svg);sw.appendChild(svg);
+    const COL=['#c4d3e2','#f0cf74','#e0990f','#d2411e','#8e1b1b'].map(hex),NAMES=['Below 0.10','0.10–0.29','0.30–0.49','0.50–0.79','0.80+'];
+    const groups=[{g:2,name:'Treatment',x0:20},{g:1,name:'Control',x0:520}];
+    const bw=96,sp=9.2,per=9,baseY=246;
+    let dots=[],state='pre',gen=0;
+    function pos(d,s){const b=s==='pre'?d.pre:d.post,k=s==='pre'?d.kpre:d.kpost;return[d.gr.x0+b*bw+6+(k%per)*sp,baseY-Math.floor(k/per)*sp];}
+    function build(){
+      svg.innerHTML='';dots=[];
+      groups.forEach(gr=>{
+        const mem=BANDS.filter(r=>r[2]===gr.g),cp=[0,0,0,0,0],cq=[0,0,0,0,0];gr.counts={pre:[0,0,0,0,0],post:[0,0,0,0,0]};
+        mem.forEach(r=>{const d={pre:r[0],post:r[1],gr,kpre:cp[r[0]]++,kpost:cq[r[1]]++};gr.counts.pre[r[0]]++;gr.counts.post[r[1]]++;dots.push(d);});
+        el('text',{x:gr.x0,y:24,class:'strong',style:'font-size:16px'},svg,gr.name+' · '+mem.length+' employees');
+        gr.sum=el('text',{x:gr.x0,y:44,style:'font-size:13px;font-weight:600;fill:#d2411e'},svg,'');
+        el('line',{x1:gr.x0,x2:gr.x0+bw*5-14,y1:baseY+6,y2:baseY+6,class:'axis'},svg);
+        NAMES.forEach((n,b)=>{el('text',{x:gr.x0+b*bw+6,y:baseY+22,class:'mut',style:'font-size:11.5px'},svg,n);});
+        gr.cnt=NAMES.map((n,b)=>el('text',{x:gr.x0+b*bw+6,y:baseY+38,class:'strong',style:'font-size:13px'},svg,''));
+      });
+      dots.forEach(d=>{const [x,y]=pos(d,'pre');d.c=el('circle',{cx:x,cy:y,r:3.7,fill:'rgb('+COL[d.pre].join(',')+')',opacity:0},svg);d.x=x;d.y=y;d.col=COL[d.pre].slice();});
+      labels('pre');
+    }
+    function labels(s){
+      groups.forEach(gr=>{
+        gr.cnt.forEach((t,b)=>t.textContent=String(gr.counts[s][b]));
+        const hi=gr.counts.pre[3]+gr.counts.pre[4],hp=gr.counts.post[3]+gr.counts.post[4];
+        gr.sum.textContent=s==='pre'?'Flight risk 0.50+: '+hi+' employees':'Flight risk 0.50+: '+hp+' employees (was '+hi+')';
+      });
+      document.querySelectorAll('#vdMove .vd-tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===s));
+      const t=groups[0],c=groups[1];
+      cap.innerHTML=s==='pre'
+        ?'Before the pilot the two groups look alike: <b>'+(t.counts.pre[3]+t.counts.pre[4])+'</b> treatment and <b>'+(c.counts.pre[3]+c.counts.pre[4])+'</b> control employees sit at flight risk 0.50 or higher.'
+        :'After the pilot, treatment employees at 0.50+ fell from <b>'+(t.counts.pre[3]+t.counts.pre[4])+' to '+(t.counts.post[3]+t.counts.post[4])+'</b>, while control moved from <b>'+(c.counts.pre[3]+c.counts.pre[4])+' to '+(c.counts.post[3]+c.counts.post[4])+'</b>. Simulated scores, not real employees.';
+    }
+    function go(to,instant){
+      const g=++gen,from=state;state=to;
+      const tc=d=>COL[to==='pre'?d.pre:d.post];
+      const fx=dots.map(d=>[d.x,d.y,d.col.slice()]);
+      tween(instant?0:1300,e=>{
+        if(g!==gen)return;
+        dots.forEach((d,i)=>{const [tx,ty]=pos(d,to),f=fx[i],c=tc(d);
+          d.x=f[0]+(tx-f[0])*e;d.y=f[1]+(ty-f[1])*e;d.col=f[2].map((v,k)=>v+(c[k]-v)*e);
+          d.c.setAttribute('cx',d.x);d.c.setAttribute('cy',d.y);d.c.setAttribute('fill','rgb('+d.col.map(Math.round).join(',')+')');});
+      },()=>{if(g===gen)labels(to);});
+    }
+    root.querySelectorAll('.vd-tabs button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+    function play(){
+      gen++;const g=gen;state='pre';build();
+      tween(900,e=>{if(g===gen)dots.forEach((d,i)=>d.c.setAttribute('opacity',clamp(e*2-(i/dots.length)*1)));},()=>{
+        if(g!==gen)return;setTimeout(()=>{if(g===gen)go('post');},reduce?0:900);
+      });
+    }
+    root.querySelector('.lab-replay').addEventListener('click',play);
+    onVisible(root,play,.3);
+  })();
+
+  /* 2 ── power explainer */
+  (function(){
+    const P0=0.146,OBS=0.3,BUILT=6.8;
+    const root=document.getElementById('vdPower'),svg=root.querySelector('svg');
+    const sw=document.createElement('div');sw.className='lab-scroll';svg.parentNode.insertBefore(sw,svg);sw.appendChild(svg);
+    const eff=document.getElementById('vdEff'),nn=document.getElementById('vdN');
+    const Phi=x=>{const t=1/(1+0.2316419*Math.abs(x)),d=0.3989423*Math.exp(-x*x/2),p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p;};
+    const power=(dpp,n)=>{const d=dpp/100,p1=Math.max(1e-6,P0-d),se=Math.sqrt(p1*(1-p1)/n+P0*(1-P0)/n);if(d<=0)return .05;const z=d/se;return Phi(z-1.96)+Phi(-z-1.96);};
+    const mde=n=>{let lo=0.01,hi=40;for(let i=0;i<40;i++){const m=(lo+hi)/2;if(power(m,n)<.8)lo=m;else hi=m;}return(lo+hi)/2;};
+    const need=dpp=>{if(dpp<=0.05)return null;let lo=20,hi=200000;if(power(dpp,hi)<.8)return Infinity;for(let i=0;i<40;i++){const m=Math.round((lo+hi)/2);if(power(dpp,m)<.8)lo=m;else hi=m;}return hi;};
+    const W=560,L=40,R=16,top=16,base=222,H=base-top,X=v=>L+v/12*(W-L-R),Y=p=>base-p*H;
+    let curve,mark,dropv,tag,obsL,obsT,builtL,builtT,mdeL,mdeT,drawn=false;
+    function frame(){
+      svg.innerHTML='';
+      [0,.2,.4,.6,.8,1].forEach(p=>{el('line',{x1:L,x2:W-R,y1:Y(p),y2:Y(p),class:'axis'},svg);el('text',{x:L-6,y:Y(p)+4,'text-anchor':'end',class:'mut'},svg,Math.round(p*100)+'%');});
+      for(let v=0;v<=12;v+=2){el('text',{x:X(v),y:base+18,'text-anchor':'middle',class:'mut'},svg,v+'');}
+      el('text',{x:(L+W-R)/2,y:base+40,'text-anchor':'middle',class:'mut'},svg,'True drop in attrition (percentage points)');
+      el('text',{x:L+8,y:top+16,class:'mut',style:'font-size:11.5px'},svg,'Chance of detecting it');
+      el('line',{x1:L,x2:W-R,y1:Y(.8),y2:Y(.8),stroke:'#08244a','stroke-width':1,'stroke-dasharray':'4 3'},svg);
+      el('text',{x:W-R-4,y:Y(.8)-5,'text-anchor':'end',class:'mut'},svg,'80% is the usual target');
+      builtL=el('line',{x1:X(BUILT),x2:X(BUILT),y1:top,y2:base,stroke:'#1a6db8','stroke-width':1.5,'stroke-dasharray':'2 3'},svg);
+      builtT=el('text',{x:X(BUILT)+5,y:top+12,class:'mut',style:'fill:#12519a'},svg,'Script assumed ≈6.8 pp');
+      obsL=el('line',{x1:X(OBS),x2:X(OBS),y1:top+26,y2:base,stroke:'#d2411e','stroke-width':1.5},svg);
+      obsT=el('text',{x:X(OBS)+5,y:top+40,style:'fill:#d2411e;font-weight:600'},svg,'Observed 0.3');
+      curve=el('path',{d:'',fill:'none',stroke:'#1a6db8','stroke-width':3,'stroke-linecap':'round'},svg);
+      mdeL=el('line',{x1:0,x2:0,y1:Y(.8),y2:base,stroke:'#e0990f','stroke-width':2},svg);
+      mdeT=el('text',{x:0,y:base-6,style:'fill:#8a5a00;font-weight:600'},svg,'');
+      dropv=el('line',{x1:0,x2:0,y1:base,y2:base,stroke:'#08244a','stroke-width':1.2},svg);
+      mark=el('circle',{cx:0,cy:base,r:6.5,fill:'#08244a',stroke:'#fff','stroke-width':2},svg);
+      tag=el('text',{x:0,y:0,'text-anchor':'middle',class:'strong'},svg,'');
+    }
+    function update(){
+      const n=+nn.value,e=+eff.value,m=mde(n);
+      document.getElementById('vdEffO').textContent=e.toFixed(1)+' pp';document.getElementById('vdNO').textContent=n.toLocaleString('en-US');
+      let d='';for(let v=0;v<=12.001;v+=.2){d+=(v===0?'M':'L')+X(v)+','+Y(power(v,n));}
+      curve.setAttribute('d',d);
+      const p=power(e,n);mark.setAttribute('cx',X(e));mark.setAttribute('cy',Y(p));
+      dropv.setAttribute('x1',X(e));dropv.setAttribute('x2',X(e));dropv.setAttribute('y1',Y(p));dropv.setAttribute('y2',base);
+      tag.setAttribute('x',clamp(X(e),L+24,W-R-24));tag.setAttribute('y',Y(p)-12);tag.textContent=Math.round(p*100)+'%';
+      const mx=m<=12?X(m):null;
+      if(mx){mdeL.setAttribute('x1',mx);mdeL.setAttribute('x2',mx);mdeL.setAttribute('opacity',1);mdeT.setAttribute('x',mx+5);mdeT.textContent=m.toFixed(1)+' pp';}else{mdeL.setAttribute('opacity',0);mdeT.textContent='';}
+      document.getElementById('rdPower').textContent=(e<=0?'5%':Math.round(p*100)+'%');
+      document.getElementById('rdMde').textContent=m.toFixed(1)+' pp';
+      const nd=need(e);document.getElementById('rdNeed').textContent=nd===null?'–':nd===Infinity?'200,000+':nd.toLocaleString('en-US');
+      document.getElementById('vdFoot').textContent='The simulation script modeled a drop of about '+BUILT.toFixed(1)+' pp (12.8% vs 19.6% average attrition probability). With '+n.toLocaleString('en-US')+' people per group, a test would catch a drop that size '+Math.round(power(BUILT,n)*100)+'% of the time. Baseline attrition assumed: 14.6%, the control group rate. Standard two-group z-test, 5% significance.';
+    }
+    frame();update();
+    eff.addEventListener('input',update);nn.addEventListener('input',update);
+    onVisible(root,()=>{ // one intro: the dot sweeps along the curve to its starting spot
+      if(reduce)return;const target=+eff.value;let t0=null;
+      (function s(nw){if(t0===null)t0=nw;const t=clamp((nw-t0)/1400),e=ease(t)*target;eff.value=e;update();if(t<1)requestAnimationFrame(s);else{eff.value=target;update();}})(performance.now());
+    },.3);
+  })();
+
+  /* 3 ── stamped rulings */
+  (function(){
+    const box=document.getElementById('verdicts');document.getElementById('vdGrid').parentNode.classList.add('js-stamps');
+    const cards=[...box.querySelectorAll('.verdict')];
+    onVisible(box,()=>cards.forEach((c,i)=>setTimeout(()=>c.classList.add('in'),reduce?0:i*450)),.3);
   })();
 })();
 
