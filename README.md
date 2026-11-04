@@ -207,7 +207,16 @@ The enhanced intervention includes:
 * personalized development plan
 * internal mobility discussion
 
-The simulated pilot showed a meaningful engagement lift of approximately **4.6 points** for the treatment group compared with the control group. Flight risk also decreased, while short-term attrition reduction was small and not statistically significant. This suggests the intervention improved leading workforce indicators, while actual attrition may require a longer observation window.
+**All results below come from a simulated experiment on synthetic data. They are not real-world business outcomes.**
+
+| Outcome | Estimate | 95% CI | p-value |
+|---|---|---|---|
+| Engagement change, Treatment − Control (points) | +4.64 (Treatment +5.06 vs Control +0.42) | [4.10, 5.19] | p < 0.001 (Significant) |
+| Flight-risk score change, Treatment − Control | −0.0533 (Treatment −0.0540 vs Control −0.0007) | [−0.0601, −0.0465] | p < 0.001 (Significant) |
+| Observed attrition rate difference, Control − Treatment (pp) | 0.3 (14.3% Treatment vs 14.6% Control) | [−5.65, 6.29] | p = 0.916 (Not Significant) |
+| Attrition odds ratio, Treatment vs Control (adjusted) | 0.906 | [0.543, 1.508] | p = 0.704 (Not Significant) |
+
+In the simulated data, engagement and flight-risk scores differed between groups, while the observed attrition rate difference was not statistically significant. The odds-ratio confidence interval includes 1, so no protective effect on attrition can be claimed.
 
 ### A/B Testing Design
 
@@ -234,14 +243,14 @@ The simulated pilot showed a meaningful engagement lift of approximately **4.6 p
 
 ### A/B Testing Interpretation
 
-The A/B testing module shows that the retention intervention produced a meaningful improvement in engagement and flight risk indicators. However, the short-term attrition impact was not statistically significant. This is a realistic workforce analytics result because engagement and risk signals often change before actual attrition outcomes become visible.
+In the simulated data, the treatment group showed higher engagement change and a larger flight-risk score decrease than the control group (both p < 0.001). The observed attrition rate difference was small and not statistically significant, so the simulation does not show an effect on attrition. These are simulated findings about how the analysis would work, not evidence that a retention program works in a real organization; a real pilot with a longer follow-up window would be needed to test whether engagement or risk changes translate into lower attrition.
 
-The strongest response appeared among:
+In the simulation, the largest engagement differences appeared among:
 
 * high-performing flight risks
 * career-stalled employees
 
-This suggests that targeted intervention may be more effective than applying the same retention program uniformly across all employees.
+This is a hypothesis to test in a real pilot: a targeted intervention may work better than applying the same retention program uniformly across all employees.
 
 ---
 
