@@ -62,6 +62,26 @@ dir.create("data/processed",  recursive = TRUE, showWarnings = FALSE)
 
 message("\n=== HCDIS A/B Testing Module: Retention Intervention ===\n")
 
+# ── Reporting helpers ─────────────────────────────────────────────────────────
+# Use the numeric p-value (never a formatted string) for every significance
+# decision, and format very small p-values as "p < 0.001".
+
+format_p <- function(p, digits = 3) {
+  if (is.na(p)) return("—")
+  if (p < 0.001) "p < 0.001" else paste0("p = ", formatC(p, format = "f", digits = digits))
+}
+
+sig_label <- function(p, alpha = 0.05) {
+  if (is.na(p)) return("—")
+  paste0(format_p(p), if (p < alpha) " (Significant)" else " (Not Significant)")
+}
+
+# Cohen's d thresholds: <0.2 negligible, 0.2–0.5 small, 0.5–0.8 medium, >=0.8 large
+cohen_label <- function(d) {
+  a <- abs(d)
+  if (a < 0.2) "Negligible" else if (a < 0.5) "Small" else if (a < 0.8) "Medium" else "Large"
+}
+
 # ── 1. Load workforce data ────────────────────────────────────────────────────
 
 # Load the full synthetic workforce dataset created in step 01
@@ -342,8 +362,8 @@ message("  Control mean change:   ", round(mean(control_engage), 2), " points")
 message("  Difference:            ", round(mean(treatment_engage) - mean(control_engage), 2), " points")
 message("  95% CI: [", round(engage_ttest$conf.int[1], 2), ", ",
         round(engage_ttest$conf.int[2], 2), "]")
-message("  p-value: ", format.pval(engage_ttest$p.value, digits = 4))
-message("  Cohen's d: ", round(cohens_d_engage, 3), " (medium effect)")
+message("  p-value: ", format_p(engage_ttest$p.value))
+message("  Cohen's d: ", round(cohens_d_engage, 3), " (", tolower(cohen_label(cohens_d_engage)), " effect)")
 
 # ── 6b. Flight risk reduction t-test ───────────────────────────────────────
 
@@ -365,7 +385,10 @@ risk_ttest <- t.test(
 message("\nFlight risk reduction t-test:")
 message("  Treatment mean change: ", round(mean(treatment_risk), 4))
 message("  Control mean change:   ", round(mean(control_risk), 4))
-message("  p-value: ", format.pval(risk_ttest$p.value, digits = 4))
+message("  Difference (T - C):    ", round(mean(treatment_risk) - mean(control_risk), 4))
+message("  95% CI for difference: [", round(risk_ttest$conf.int[1], 4), ", ",
+        round(risk_ttest$conf.int[2], 4), "]")
+message("  p-value: ", format_p(risk_ttest$p.value))
 
 # ── 6c. Attrition rate proportion test ─────────────────────────────────────
 
@@ -397,8 +420,9 @@ message("  Treatment attrition rate: ",
         round(attrition_counts$attrition_rate[attrition_counts$treatment_group == "Treatment"] * 100, 1), "%")
 message("  Control attrition rate:   ",
         round(attrition_counts$attrition_rate[attrition_counts$treatment_group == "Control"] * 100, 1), "%")
-message("  Reduction: ", round(attr_reduction_pp, 1), " percentage points")
-message("  p-value: ", format.pval(prop_test$p.value, digits = 4))
+message("  Observed rate difference (Control - Treatment): ", round(attr_reduction_pp, 1),
+        " percentage points (", if (prop_test$p.value < 0.05) "statistically significant" else "not statistically significant", ")")
+message("  p-value: ", format_p(prop_test$p.value))
 
 # ── 6d. Logistic regression for attrition outcome ──────────────────────────
 # Controls for pre-existing risk level so we isolate the intervention's effect
@@ -451,49 +475,94 @@ message("\nHeterogeneous effects by segment:")
 print(segment_effects |> select(treatment_effect_segment, engagement_lift, attrition_delta, business_insight))
 
 # ── 6f. Comprehensive results summary table ─────────────────────────────────
+#
+# Each row reports ONE estimand, its 95% CI and its p-value, so the three always
+# describe the same quantity:
+#   - Engagement / flight risk: BETWEEN-GROUP DIFFERENCE (Treatment - Control).
+#     t.test(treatment, control) returns the CI and p-value for this difference,
+#     so the estimate shown must be the difference, not the treatment-group mean.
+#     Group means are reported in the interpretation text.
+#   - Attrition rate difference (Control - Treatment, in pp): CI and p-value come
+#     from prop.test(). The CI is sign-flipped to match Control - Treatment.
+#   - Odds ratio: estimate, CI (profile likelihood) and p-value from the
+#     covariate-adjusted logistic regression.
+# Significance is always decided from the NUMERIC p-value.
+
+mean_t_eng  <- mean(treatment_engage);  mean_c_eng  <- mean(control_engage)
+mean_t_risk <- mean(treatment_risk);    mean_c_risk <- mean(control_risk)
+diff_eng    <- mean_t_eng  - mean_c_eng
+diff_risk   <- mean_t_risk - mean_c_risk
+
+rate_t <- attrition_counts$attrition_rate[attrition_counts$treatment_group == "Treatment"] * 100
+rate_c <- attrition_counts$attrition_rate[attrition_counts$treatment_group == "Control"]   * 100
+
+# prop.test() was run with Treatment first, so its CI is for (Treatment - Control).
+# Flip sign and order to express Control - Treatment, in percentage points.
+attr_diff_ci <- sort(-prop_test$conf.int * 100)
+
+or_est <- unname(exp(coef(logit_model)["treatment_groupTreatment"]))
+or_ci  <- exp(confint(logit_model, "treatment_groupTreatment"))   # profile likelihood
+or_p   <- coef(summary(logit_model))["treatment_groupTreatment", "Pr(>|z|)"]
+or_ci_includes_1 <- or_ci[1] <= 1 && or_ci[2] >= 1
 
 results_summary <- tibble(
   outcome = c(
-    "Engagement improvement (points)",
-    "Flight risk change",
-    "Post-intervention attrition rate — Treatment",
-    "Post-intervention attrition rate — Control",
-    "Attrition rate reduction (pp)",
-    "Attrition odds ratio (Treatment vs Control)"
+    "Engagement improvement, Treatment − Control (points)",
+    "Flight risk change, Treatment − Control",
+    "Post-intervention attrition rate — Treatment (%)",
+    "Post-intervention attrition rate — Control (%)",
+    "Observed attrition rate difference, Control − Treatment (pp)",
+    "Attrition odds ratio (Treatment vs Control, adjusted)"
   ),
   treatment_value = c(
-    round(mean(treatment_engage), 2),
-    round(mean(treatment_risk), 4),
-    round(attrition_counts$attrition_rate[attrition_counts$treatment_group == "Treatment"] * 100, 1),
-    round(attrition_counts$attrition_rate[attrition_counts$treatment_group == "Control"] * 100, 1),
+    round(diff_eng, 2),
+    round(diff_risk, 4),
+    round(rate_t, 1),
+    round(rate_c, 1),
     round(attr_reduction_pp, 1),
-    round(exp(coef(logit_model)["treatment_groupTreatment"]), 3)
+    round(or_est, 3)
   ),
-  p_value = c(
-    format.pval(engage_ttest$p.value, digits = 3),
-    format.pval(risk_ttest$p.value, digits = 3),
-    format.pval(prop_test$p.value, digits = 3),
-    "—", "—", "—"
+  p_numeric = c(
+    engage_ttest$p.value,
+    risk_ttest$p.value,
+    NA, NA,
+    prop_test$p.value,
+    or_p
   ),
   ci_lower = c(
     round(engage_ttest$conf.int[1], 2),
     round(risk_ttest$conf.int[1], 4),
-    NA, NA, NA,
-    round(exp(confint(logit_model, "treatment_groupTreatment"))[1], 3)
+    NA, NA,
+    round(attr_diff_ci[1], 2),
+    round(or_ci[1], 3)
   ),
   ci_upper = c(
     round(engage_ttest$conf.int[2], 2),
     round(risk_ttest$conf.int[2], 4),
-    NA, NA, NA,
-    round(exp(confint(logit_model, "treatment_groupTreatment"))[2], 3)
+    NA, NA,
+    round(attr_diff_ci[2], 2),
+    round(or_ci[2], 3)
   ),
   business_interpretation = c(
-    "The intervention improved average engagement by meaningful amount — HR should treat this as a causal signal",
-    "Flight risk decreased in treatment group — reduction is statistically reliable",
-    "Attrition rate in the treatment group after intervention",
-    "Attrition rate in the control group (comparison baseline)",
-    "Attrition reduction attributable to the intervention",
-    "Treatment group is less likely to leave — odds ratio < 1 = protective effect"
+    paste0("Simulated result: engagement rose ", sprintf("%+.2f", mean_t_eng), " points in the treatment group vs ",
+           sprintf("%+.2f", mean_c_eng), " in control (difference ", sprintf("%+.2f", diff_eng), "). ",
+           if (engage_ttest$p.value < 0.05) "Statistically significant in this synthetic data." else "Not statistically significant.",
+           " Not a real-world business outcome."),
+    paste0("Simulated result: flight-risk score changed ", sprintf("%+.4f", mean_t_risk), " in the treatment group vs ",
+           sprintf("%+.4f", mean_c_risk), " in control (difference ", sprintf("%+.4f", diff_risk), "). ",
+           if (risk_ttest$p.value < 0.05) "Statistically significant in this synthetic data." else "Not statistically significant.",
+           " Not a real-world business outcome."),
+    "Simulated attrition rate in the treatment group after the intervention",
+    "Simulated attrition rate in the control group (comparison baseline)",
+    paste0("Observed attrition rate difference (",
+           if (prop_test$p.value < 0.05) "statistically significant" else "not statistically significant", ")"),
+    if (or_ci_includes_1) {
+      "Estimated effect was not statistically significant: the 95% CI includes 1, so no protective effect can be claimed"
+    } else if (or_est < 1) {
+      "Odds ratio < 1 and 95% CI excludes 1: lower odds of attrition in the treatment group (simulated data)"
+    } else {
+      "Odds ratio > 1 and 95% CI excludes 1: higher odds of attrition in the treatment group (simulated data)"
+    }
   )
 )
 
@@ -755,7 +824,7 @@ v3 <- plot_ly() |>
       "Engagement Score Change: Treatment vs Control<br>",
       "<sup>Mean difference: +",
       round(mean(treatment_engage) - mean(control_engage), 1),
-      " points | p = ", format.pval(engage_ttest$p.value, digits = 3), "</sup>"
+      " points | ", sig_label(engage_ttest$p.value), " | simulated data</sup>"
     )),
     yaxis = list(title = "Engagement score change (post − pre)",
                  gridcolor = "#c8ddf0", zeroline = TRUE,
@@ -773,7 +842,7 @@ v3 <- plot_ly() |>
       x = 0.98, y = 0.98,
       xref = "paper", yref = "paper",
       text = paste0("<b>Effect size (Cohen's d): ",
-                    round(cohens_d_engage, 2), "</b><br>Medium effect"),
+                    round(cohens_d_engage, 2), "</b><br>", cohen_label(cohens_d_engage), " effect"),
       showarrow = FALSE,
       font = list(size = 11, color = "#0c3c78"),
       bgcolor = "rgba(228,238,248,0.9)",
@@ -833,8 +902,8 @@ v4 <- plot_ly() |>
   layout(
     title = list(text = paste0(
       "Post-Intervention Attrition Rate: Treatment vs Control<br>",
-      "<sup>Reduction: ", round(attr_reduction_pp, 1),
-      " pp | p = ", format.pval(prop_test$p.value, digits = 3), "</sup>"
+      "<sup>Observed difference: ", round(attr_reduction_pp, 1),
+      " pp | ", sig_label(prop_test$p.value), " | simulated data</sup>"
     )),
     xaxis = list(title = "", showgrid = FALSE),
     yaxis = list(title = "Post-intervention attrition rate (%)",
@@ -846,12 +915,13 @@ v4 <- plot_ly() |>
     annotations = list(list(
       x    = 0.5, y = min(overall_attr$attrition_pct) + attr_reduction_pp / 2,
       xref = "paper", yref = "y",
-      text = paste0("↓ ", round(attr_reduction_pp, 1), " pp reduction"),
+      text = paste0("Observed difference: ", round(attr_reduction_pp, 1),
+                    " pp<br>(", if (prop_test$p.value < 0.05) "statistically significant" else "not statistically significant", ")"),
       showarrow  = TRUE,
-      arrowhead  = 2, arrowcolor = clr_success, arrowwidth = 2,
-      font       = list(color = clr_success, size = 12, family = "Outfit, sans-serif"),
-      bgcolor    = "rgba(230,247,238,0.95)",
-      bordercolor = clr_success, borderwidth = 1, borderpad = 6
+      arrowhead  = 2, arrowcolor = clr_control, arrowwidth = 2,
+      font       = list(color = "#3a6090", size = 12, family = "Outfit, sans-serif"),
+      bgcolor    = "rgba(228,238,248,0.95)",
+      bordercolor = clr_control, borderwidth = 1, borderpad = 6
     ))
   )
 
@@ -860,16 +930,11 @@ save_html_widget(v4, "11_ab_test_attrition_impact.html", "Attrition Impact")
 # ── VISUAL 5: Effect size summary table ───────────────────────────────────────
 # File: 12_ab_test_treatment_effect_summary.html
 
+# Significance label is built from the numeric p-value (p_numeric), never from
+# a formatted string. as.numeric("<2e-16") returns NA, which previously sent
+# the very small p-values into the "(ns)" branch.
 summary_display <- results_summary |>
-  mutate(
-    significance = case_when(
-      p_value == "—" ~ "—",
-      as.numeric(p_value) < 0.001 ~ "< 0.001 ✓✓✓",
-      as.numeric(p_value) < 0.01  ~ paste0(p_value, " ✓✓"),
-      as.numeric(p_value) < 0.05  ~ paste0(p_value, " ✓"),
-      TRUE ~ paste0(p_value, " (ns)")
-    )
-  )
+  mutate(significance = vapply(p_numeric, sig_label, character(1)))
 
 v5 <- reactable(
   summary_display |> select(outcome, treatment_value, significance, ci_lower, ci_upper, business_interpretation),
@@ -882,24 +947,24 @@ v5 <- reactable(
     treatment_value = colDef(
       name = "Estimate",
       align = "center",
-      width = 100,
+      width = 110,
       style = list(fontFamily = "IBM Plex Mono, monospace", color = "#1a5ca5",
                    fontWeight = "600", fontSize = "13px")
     ),
     significance = colDef(
       name = "p-value",
       align = "center",
-      width = 140,
+      width = 210,
       style = function(value) {
-        color <- if (grepl("✓", value)) "#1a7a48" else if (value == "—") "#6898c0" else "#c8302a"
+        color <- if (grepl("\\(Significant\\)", value)) "#1a7a48" else if (value == "—") "#6898c0" else "#c8302a"
         list(color = color, fontFamily = "IBM Plex Mono, monospace",
              fontSize = "11px", fontWeight = "600")
       }
     ),
-    ci_lower = colDef(name = "CI lower", align = "center", width = 90,
+    ci_lower = colDef(name = "95% CI lower", align = "center", width = 110, na = "—",
                       style = list(fontFamily = "IBM Plex Mono, monospace",
                                    fontSize = "11px", color = "#3a6090")),
-    ci_upper = colDef(name = "CI upper", align = "center", width = 90,
+    ci_upper = colDef(name = "95% CI upper", align = "center", width = 110, na = "—",
                       style = list(fontFamily = "IBM Plex Mono, monospace",
                                    fontSize = "11px", color = "#3a6090")),
     business_interpretation = colDef(
@@ -920,6 +985,17 @@ v5 <- reactable(
                             fontFamily = "IBM Plex Mono, monospace",
                             fontSize = "11px", letterSpacing = "0.1em",
                             textTransform = "uppercase", fontWeight = "500")
+  )
+)
+v5 <- htmlwidgets::prependContent(
+  v5,
+  htmltools::tags$div(
+    style = paste0("font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0c3c78;",
+                   "background:#e4eef8;border:1px solid #a8c8e0;border-radius:6px;",
+                   "padding:8px 12px;margin-bottom:10px;line-height:1.5;"),
+    htmltools::tags$b("Simulated findings."),
+    " Results come from a synthetic workforce and simulated outcomes; they are not real-world business outcomes.",
+    " Estimates for engagement and flight risk are Treatment − Control differences, shown with the 95% CI and p-value of that same difference."
   )
 )
 save_html_widget(v5, "12_ab_test_treatment_effect_summary.html", "Effect Summary")
@@ -1009,21 +1085,19 @@ message("  Treatment group: ", sum(ab_data$treatment_group == "Treatment"), " em
 message("  Control group:   ", sum(ab_data$treatment_group == "Control"), " employees")
 message("")
 message("  KEY RESULTS:")
-message("  → Engagement improved by +",
+message("  → Simulated engagement change was +",
         round(mean(treatment_engage) - mean(control_engage), 1),
-        " points more in treatment vs control (p = ",
-        format.pval(engage_ttest$p.value, digits = 3), ")")
-message("  → Attrition rate reduced by ", round(attr_reduction_pp, 1),
-        " percentage points (p = ", format.pval(prop_test$p.value, digits = 3), ")")
+        " points higher in treatment vs control (", sig_label(engage_ttest$p.value), ")")
+message("  → Observed attrition rate difference: ", round(attr_reduction_pp, 1),
+        " percentage points (", sig_label(prop_test$p.value), ")")
 message("  → Effect size (Cohen's d): ", round(cohens_d_engage, 2),
-        " — a practically meaningful improvement")
+        " — ", tolower(cohen_label(cohens_d_engage)), " standardised difference in the simulated data")
 message("  → Strongest responders: High performers at risk & Career-stalled employees")
 message("")
-message("  HR RECOMMENDATION:")
-message("  Scale the intervention to the full eligible population with priority")
-message("  given to high-performer flight risks and career-stalled employees.")
-message("  Monitor 90-day post-intervention engagement and attrition signals.")
-message("  Run a second randomized cohort to confirm external validity.")
+message("  HR RECOMMENDATION (for a real pilot, not supported by these simulated data):")
+message("  A real pilot would need to be run before any scale-up decision. Prioritise")
+message("  high-performer flight risks and career-stalled employees, monitor 90-day")
+message("  engagement and attrition signals, and run a second randomized cohort.")
 message("")
 message("  ETHICAL NOTE:")
 message("  These results are from simulated outcomes. In a real deployment,")
